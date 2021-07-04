@@ -1,7 +1,8 @@
 {
   "name": "typescript-action",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "TypeScript template action",
   "main": "lib/main.js",
   "scripts": {
@@ -15,15 +16,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/matjahs/get-changed-workspaces.git"
   },
-  "keywords": [
-    "actions",
-    "node",
-    "setup"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.4.0",
     "@actions/exec": "^1.1.0",
