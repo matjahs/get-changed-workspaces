@@ -21,7 +21,8 @@
   "dependencies": {
     "@actions/core": "^1.4.0",
     "@actions/exec": "^1.1.0",
-    "pkg-dir": "^5.0.0"
+    "pkg-dir": "^5.0.0",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
