@@ -2,6 +2,8 @@
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
 
+[![build-test](https://github.com/matjahs/get-changed-workspaces/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/matjahs/get-changed-workspaces/actions/workflows/test.yml)
+
 # Create a JavaScript Action using TypeScript
 
 Use this template to bootstrap the creation of a TypeScript action.:rocket:

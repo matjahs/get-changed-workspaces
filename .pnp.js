@@ -2013,6 +2013,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:20.2.9"
       ],
       [
+        "yarn",
+        "npm:1.22.10"
+      ],
+      [
         "yocto-queue",
         "npm:0.1.0"
       ]
@@ -2039,7 +2043,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pkg-dir", "npm:5.0.0"],
             ["prettier", "npm:2.3.2"],
             ["ts-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
+            ["yarn", "npm:1.22.10"]
           ],
           "linkType": "SOFT",
         }]
@@ -8629,7 +8634,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["pkg-dir", "npm:5.0.0"],
             ["prettier", "npm:2.3.2"],
             ["ts-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
+            ["yarn", "npm:1.22.10"]
           ],
           "linkType": "SOFT",
         }]
@@ -8964,6 +8970,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/yargs-parser-npm-20.2.9-a1d19e598d-3c58da6f61.zip/node_modules/yargs-parser/",
           "packageDependencies": [
             ["yargs-parser", "npm:20.2.9"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["yarn", [
+        ["npm:1.22.10", {
+          "packageLocation": "./.yarn/unplugged/yarn-npm-1.22.10-b1a926d20f/node_modules/yarn/",
+          "packageDependencies": [
+            ["yarn", "npm:1.22.10"]
           ],
           "linkType": "HARD",
         }]
