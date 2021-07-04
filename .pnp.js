@@ -993,6 +993,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:1.2.1"
       ],
       [
+        "husky",
+        "npm:7.0.0"
+      ],
+      [
         "iconv-lite",
         "npm:0.6.3"
       ],
@@ -2037,6 +2041,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint", "npm:7.30.0"],
             ["eslint-plugin-github", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:4.1.3"],
             ["eslint-plugin-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:24.3.6"],
+            ["husky", "npm:7.0.0"],
             ["jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.6"],
             ["jest-circus", "npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
@@ -5665,6 +5670,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["husky", [
+        ["npm:7.0.0", {
+          "packageLocation": "./.yarn/cache/husky-npm-7.0.0-f5b54b1293-56252eeb45.zip/node_modules/husky/",
+          "packageDependencies": [
+            ["husky", "npm:7.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["iconv-lite", [
         ["npm:0.4.24", {
           "packageLocation": "./.yarn/cache/iconv-lite-npm-0.4.24-c5c4ac6695-a9b9521066.zip/node_modules/iconv-lite/",
@@ -8628,6 +8642,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint", "npm:7.30.0"],
             ["eslint-plugin-github", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:4.1.3"],
             ["eslint-plugin-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:24.3.6"],
+            ["husky", "npm:7.0.0"],
             ["jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.6"],
             ["jest-circus", "npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
