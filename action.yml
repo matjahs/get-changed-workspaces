@@ -1,11 +1,15 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Get changed workspaces'
+description: 'Get list of changed workspaces in a Yarn v2 monorepo'
+
 inputs:
-  milliseconds: # change this
+  files:
+    description: Array of all changed files to validate, encoded as a JSON array
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+
+outputs:
+  targets:
+    description: The list of Yarn workspaces to test, encoded as a JSON array
+
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node12
+  main: dist/index.js
