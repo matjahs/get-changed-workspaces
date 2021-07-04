@@ -3,7 +3,7 @@ import path from 'path'
 import * as core from '@actions/core'
 import pkgDir from 'pkg-dir'
 
-import {YarnWorkspacesListItem} from './listYarnWorkspaces'
+import {YarnWorkspacesListItem} from './list'
 
 interface GraphNode {
   workspaceId: string
