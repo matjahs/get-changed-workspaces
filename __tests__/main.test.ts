@@ -1,6 +1,13 @@
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
+import * as tmp from 'tmp'
+import * as mkdirp from 'mkdirp'
+
+const prepare = () => {
+  const tmpobj = tmp.dirSync()
+  mkdirp.sync(tmpobj.name + '/')
+}
 
 test.skip('throws invalid number', async () => {
   // const input = parseInt('foo', 10)

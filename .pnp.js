@@ -325,6 +325,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:0.0.29"
       ],
       [
+        "@types/mkdirp",
+        "npm:1.0.1"
+      ],
+      [
         "@types/node",
         "npm:14.17.4"
       ],
@@ -335,6 +339,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       [
         "@types/stack-utils",
         "npm:2.0.1"
+      ],
+      [
+        "@types/tmp",
+        "npm:0.2.1"
       ],
       [
         "@types/yargs",
@@ -1841,6 +1849,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "npm:6.0.1"
       ],
       [
+        "tmp",
+        "npm:0.2.1"
+      ],
+      [
         "tmpl",
         "npm:1.0.4"
       ],
@@ -2035,7 +2047,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@actions/core", "npm:1.4.0"],
             ["@actions/exec", "npm:1.1.0"],
             ["@types/jest", "npm:26.0.23"],
+            ["@types/mkdirp", "npm:1.0.1"],
             ["@types/node", "npm:14.17.4"],
+            ["@types/tmp", "npm:0.2.1"],
             ["@typescript-eslint/parser", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:4.28.1"],
             ["@vercel/ncc", "npm:0.28.6"],
             ["eslint", "npm:7.30.0"],
@@ -2045,8 +2059,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.6"],
             ["jest-circus", "npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
+            ["mkdirp", "npm:1.0.4"],
             ["pkg-dir", "npm:5.0.0"],
             ["prettier", "npm:2.3.2"],
+            ["tmp", "npm:0.2.1"],
             ["ts-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.3"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["yarn", "npm:1.22.10"]
@@ -3347,6 +3363,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/mkdirp", [
+        ["npm:1.0.1", {
+          "packageLocation": "./.yarn/cache/@types-mkdirp-npm-1.0.1-0568c0101a-075e821a8f.zip/node_modules/@types/mkdirp/",
+          "packageDependencies": [
+            ["@types/mkdirp", "npm:1.0.1"],
+            ["@types/node", "npm:16.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/node", [
         ["npm:14.17.4", {
           "packageLocation": "./.yarn/cache/@types-node-npm-14.17.4-52a7500a10-947ada8b39.zip/node_modules/@types/node/",
@@ -3377,6 +3403,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-stack-utils-npm-2.0.1-867718ab70-a5277189a3.zip/node_modules/@types/stack-utils/",
           "packageDependencies": [
             ["@types/stack-utils", "npm:2.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/tmp", [
+        ["npm:0.2.1", {
+          "packageLocation": "./.yarn/cache/@types-tmp-npm-0.2.1-11801c91a5-3b15c4f7af.zip/node_modules/@types/tmp/",
+          "packageDependencies": [
+            ["@types/tmp", "npm:0.2.1"]
           ],
           "linkType": "HARD",
         }]
@@ -8421,6 +8456,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["tmp", [
+        ["npm:0.2.1", {
+          "packageLocation": "./.yarn/cache/tmp-npm-0.2.1-a9c8d9c0ca-13973825ff.zip/node_modules/tmp/",
+          "packageDependencies": [
+            ["tmp", "npm:0.2.1"],
+            ["rimraf", "npm:3.0.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["tmpl", [
         ["npm:1.0.4", {
           "packageLocation": "./.yarn/cache/tmpl-npm-1.0.4-35b37c2875-44de07fb81.zip/node_modules/tmpl/",
@@ -8636,7 +8681,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@actions/core", "npm:1.4.0"],
             ["@actions/exec", "npm:1.1.0"],
             ["@types/jest", "npm:26.0.23"],
+            ["@types/mkdirp", "npm:1.0.1"],
             ["@types/node", "npm:14.17.4"],
+            ["@types/tmp", "npm:0.2.1"],
             ["@typescript-eslint/parser", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:4.28.1"],
             ["@vercel/ncc", "npm:0.28.6"],
             ["eslint", "npm:7.30.0"],
@@ -8646,8 +8693,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.6"],
             ["jest-circus", "npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
+            ["mkdirp", "npm:1.0.4"],
             ["pkg-dir", "npm:5.0.0"],
             ["prettier", "npm:2.3.2"],
+            ["tmp", "npm:0.2.1"],
             ["ts-jest", "virtual:906bfc3217228ef3c6b6e15b118c30ad083e747c3cbed8e83b7a48250b841e07413566a757e20c360be0e5f8f7abd7a9b71c5187e47cf0cca418880f13c9c0c5#npm:27.0.3"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["yarn", "npm:1.22.10"]

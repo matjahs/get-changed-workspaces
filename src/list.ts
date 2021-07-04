@@ -14,7 +14,8 @@ const listYarnWorkspaces = async (): Promise<YarnWorkspacesListItem[]> => {
       stdout: data => {
         output.push(data)
       }
-    }
+    },
+    cwd: process.env.GITHUB_WORKSPACE
   })
   return output
     .join('')

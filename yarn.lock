@@ -873,6 +873,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mkdirp@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@types/mkdirp@npm:1.0.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 075e821a8fe69349a3b642f798b4632139982f039c8890b83bcd9068bfac3787dd536c9f3bb18bb3f9c68277431514b38e6c57509cdb766c8d7ebff9a1427ecb
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 16.0.0
   resolution: "@types/node@npm:16.0.0"
@@ -898,6 +907,13 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: a5277189a3316b84cfe9381e5b9b12ceaae82e0592d7c5f963c29061a51f90870b7c54c3882975bdf6cd3b98b87fcaa08246ca0e078679c896f7a16ec4558c4d
+  languageName: node
+  linkType: hard
+
+"@types/tmp@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@types/tmp@npm:0.2.1"
+  checksum: 3b15c4f7af51cdae5a2f83ee09ed93e79e125d0ab109ec3552a80bbc0d9b55904bb4fd615be95d68721a528e0a42c19adc97633040249e66e658513e38a66931
   languageName: node
   linkType: hard
 
@@ -5198,6 +5214,15 @@ fsevents@^2.3.2:
   languageName: node
   linkType: hard
 
+"tmp@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "tmp@npm:0.2.1"
+  dependencies:
+    rimraf: ^3.0.0
+  checksum: 13973825ff1c7aed3359bba97c146c860ebb5b1cbdca88387a2ff8bae704d2478b701cc3adc29b1461be292fed1e4ae56b378b6a0386bbab471ef32860e0a711
+  languageName: node
+  linkType: hard
+
 "tmpl@npm:1.0.x":
   version: 1.0.4
   resolution: "tmpl@npm:1.0.4"
@@ -5349,7 +5374,9 @@ fsevents@^2.3.2:
     "@actions/core": ^1.4.0
     "@actions/exec": ^1.1.0
     "@types/jest": ^26.0.23
+    "@types/mkdirp": ^1.0.1
     "@types/node": ^14.14.9
+    "@types/tmp": ^0.2.1
     "@typescript-eslint/parser": ^4.28.1
     "@vercel/ncc": ^0.28.6
     eslint: ^7.30.0
@@ -5359,8 +5386,10 @@ fsevents@^2.3.2:
     jest: ^27.0.6
     jest-circus: ^27.0.6
     js-yaml: ^4.1.0
+    mkdirp: ^1.0.4
     pkg-dir: ^5.0.0
     prettier: 2.3.2
+    tmp: ^0.2.1
     ts-jest: ^27.0.3
     typescript: ^4.3.5
     yarn: ^1.22.10

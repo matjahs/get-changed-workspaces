@@ -6,6 +6,7 @@ import YarnGraph from './graph'
 async function run(): Promise<void> {
   try {
     const files: string[] = JSON.parse(core.getInput('files', {required: true}))
+    core.info(`Input files [${files.join(', ')}]`)
 
     core.info('Building worktree dependency graph')
     const graph = new YarnGraph(await listYarnWorkspaces())

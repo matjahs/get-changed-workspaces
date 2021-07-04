@@ -19,7 +19,7 @@ interface Graphs {
   byDir: Graph
 }
 
-export default class YarnGraph {
+export class YarnGraph {
   private graph: Graphs
 
   constructor(workspaceList: YarnWorkspacesListItem[]) {
@@ -116,3 +116,5 @@ export default class YarnGraph {
     return {byId: graphById, byDir: graphByDir}
   }
 }
+
+export default YarnGraph
