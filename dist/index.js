@@ -2183,7 +2183,7 @@ module.exports = Queue;
 
 /***/ }),
 
-/***/ 602:
+/***/ 907:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2310,7 +2310,7 @@ exports.default = YarnGraph;
 
 /***/ }),
 
-/***/ 625:
+/***/ 713:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2404,30 +2404,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(38));
-const list_1 = __importDefault(__nccwpck_require__(625));
-const graph_1 = __importDefault(__nccwpck_require__(602));
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const files = JSON.parse(core.getInput('files', { required: true }));
-            core.info('Building worktree dependency graph');
-            const graph = new graph_1.default(yield list_1.default());
-            core.startGroup('Identifying directly modified workspaces');
-            const changedWorkspaces = yield graph.getWorkspacesForFiles(...files);
-            core.endGroup();
-            core.info(`Affected workspaces [${changedWorkspaces.join(', ')}]`);
-            core.startGroup('Identifying dependent workspaces');
-            const targetWorkspaces = graph.getRecursiveDependents(...changedWorkspaces);
-            core.endGroup();
-            core.info(`Target workspaces [${targetWorkspaces.join(', ')}]`);
-            core.setOutput('targets', targetWorkspaces);
-        }
-        catch (err) {
-            core.setFailed(err);
-        }
-    });
-}
-run();
+const listYarnWorkspaces_1 = __importDefault(__nccwpck_require__(713));
+const YarnGraph_1 = __importDefault(__nccwpck_require__(907));
+const subPackageRegex = /-(serverside|widgets|frontend)$/;
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const files = JSON.parse(core.getInput('files', { required: true }));
+        core.info('Building worktree dependency graph');
+        const graph = new YarnGraph_1.default(yield listYarnWorkspaces_1.default());
+        core.startGroup('Identifying directly modified workspaces');
+        const changedWorkspaces = yield graph.getWorkspacesForFiles(...files);
+        core.endGroup();
+        core.info(`Affected workspaces [${changedWorkspaces.join(', ')}]`);
+        core.startGroup('Identifying dependent workspaces');
+        const targetWorkspaces = graph.getRecursiveDependents(...changedWorkspaces);
+        core.endGroup();
+        core.info(`Target workspaces [${targetWorkspaces.join(', ')}]`);
+        const normalizedWorkspaces = targetWorkspaces.map(ws => {
+            if (!subPackageRegex.test(ws)) {
+                return ws;
+            }
+            return ws.replace(subPackageRegex, '');
+        });
+        core.setOutput('targets', normalizedWorkspaces);
+    }
+    catch (err) {
+        core.setFailed(err);
+    }
+});
+main();
 
 
 /***/ }),

@@ -1,4 +1,5 @@
 import * as exec from '@actions/exec'
+import * as path from 'path'
 
 export interface YarnWorkspacesListItem {
   location: string
@@ -6,7 +7,9 @@ export interface YarnWorkspacesListItem {
   workspaceDependencies: string[]
 }
 
-const listYarnWorkspaces = async (): Promise<YarnWorkspacesListItem[]> => {
+export const listYarnWorkspaces = async (
+  root?: string
+): Promise<YarnWorkspacesListItem[]> => {
   const output: Buffer[] = []
   await exec.exec('yarn workspaces', ['list', '-v', '--json'], {
     silent: true,
@@ -15,7 +18,7 @@ const listYarnWorkspaces = async (): Promise<YarnWorkspacesListItem[]> => {
         output.push(data)
       }
     },
-    cwd: process.env.GITHUB_WORKSPACE
+    cwd: root ? path.resolve(root) : process.env.GITHUB_WORKSPACE
   })
   return output
     .join('')

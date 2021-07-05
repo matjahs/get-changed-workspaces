@@ -1,12 +1,13 @@
 import * as core from '@actions/core'
 
-import listYarnWorkspaces from './list'
-import YarnGraph from './graph'
+import listYarnWorkspaces from './listYarnWorkspaces'
+import YarnGraph from './YarnGraph'
 
-async function run(): Promise<void> {
+const subPackageRegex = /-(serverside|widgets|frontend)$/
+
+const main = async (): Promise<void> => {
   try {
     const files: string[] = JSON.parse(core.getInput('files', {required: true}))
-    core.info(`Input files [${files.join(', ')}]`)
 
     core.info('Building worktree dependency graph')
     const graph = new YarnGraph(await listYarnWorkspaces())
@@ -21,10 +22,17 @@ async function run(): Promise<void> {
     core.endGroup()
     core.info(`Target workspaces [${targetWorkspaces.join(', ')}]`)
 
-    core.setOutput('targets', targetWorkspaces)
+    const normalizedWorkspaces = targetWorkspaces.map(ws => {
+      if (!subPackageRegex.test(ws)) {
+        return ws
+      }
+      return ws.replace(subPackageRegex, '')
+    })
+
+    core.setOutput('targets', normalizedWorkspaces)
   } catch (err) {
     core.setFailed(err)
   }
 }
 
-run()
+main()

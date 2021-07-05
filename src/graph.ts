@@ -33,11 +33,13 @@ export class YarnGraph {
     const queue = [...initialIds]
     for (const id of queue) {
       if (!resultSet.has(id)) {
+        resultSet.add(id)
         const node = this.graph.byId[id]
         if (!node) {
-          throw new Error(`Workspace '${id}' not registered in root worktree`)
+          // eslint-disable-next-line no-console
+          console.error(`Workspace '${id}' not registered in root worktree`)
+          continue
         }
-        resultSet.add(id)
         for (const dependent of node.dependents) {
           core.info(`${dependent} depends on ${node.workspaceId}`)
         }
