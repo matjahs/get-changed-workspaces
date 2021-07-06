@@ -26,7 +26,10 @@ const main = async (): Promise<void> => {
       if (!subPackageRegex.test(ws)) {
         return ws
       }
-      return ws.replace(subPackageRegex, '')
+      const normalized = ws.replace(subPackageRegex, '')
+      core.info(`replacing '${ws}' with '${normalized}'`)
+
+      return normalized
     })
 
     core.setOutput('targets', normalizedWorkspaces)
