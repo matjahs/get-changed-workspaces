@@ -38,3 +38,4 @@ jobs:
       - uses: ./
         with:
           files: '[]'
+      - run: yarn test
