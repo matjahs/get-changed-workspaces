@@ -3,4 +3,7 @@ lib/
 node_modules/
 jest.config.js
 *.md
-__fixtures__/
+/.husky/
+/.vscode/
+/.idea/
+/__fixtures__/

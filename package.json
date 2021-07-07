@@ -11,7 +11,7 @@
     "format-check": "yarn prettier --check **/*.ts",
     "lint": "yarn exec eslint '**/*.ts'",
     "package": "yarn ncc build --source-map --license licenses.txt",
-    "test": "yarn jest",
+    "test": "yarn jest --testLocationInResults",
     "all": "yarn build && yarn format && yarn lint && yarn package && yarn test",
     "postinstall": "yarn husky install"
   },
@@ -41,6 +41,7 @@
     "husky": "^7.0.0",
     "jest": "^27.0.6",
     "jest-circus": "^27.0.6",
+    "jest-github-reporter": "^1.0.2",
     "js-yaml": "^4.1.0",
     "mkdirp": "^1.0.4",
     "prettier": "2.3.2",
