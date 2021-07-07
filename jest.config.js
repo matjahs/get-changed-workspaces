@@ -8,6 +8,5 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest'
   },
-  verbose: true,
-  "reporters": ["default", "jest-github-reporter"]
+  verbose: true
 }
