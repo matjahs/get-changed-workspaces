@@ -23,7 +23,7 @@ export class YarnGraph {
   private graph: Graphs
 
   constructor(workspaceList: YarnWorkspacesListItem[]) {
-    this.graph = this.buildGraph(workspaceList)
+    this.graph = YarnGraph.buildGraph(workspaceList)
   }
 
   getRecursiveDependents(...initialIds: string[]): string[] {
@@ -36,9 +36,8 @@ export class YarnGraph {
         resultSet.add(id)
         const node = this.graph.byId[id]
         if (!node) {
-          // eslint-disable-next-line no-console
-          console.error(`Workspace '${id}' not registered in root worktree`)
-          continue
+          core.setFailed(`Workspace '${id}' not registered in root worktree`)
+          return [];
         }
         resultSet.add(id)
         for (const dependent of node.dependents) {
@@ -79,17 +78,15 @@ export class YarnGraph {
   }
 
   private getWorkspaceId(dir: string): string {
-    console.log(`trying to get workspace ID of dir: `, dir)
     const id = this.graph.byDir[path.resolve(dir)]?.workspaceId
     if (!id) {
-      throw new Error(
-        `Workspace at '${dir}' not registered in root worktree`
-      )
+      core.setFailed(`Workspace at '${dir}' not registered in root worktree`)
+      return ''
     }
     return id
   }
 
-  private buildGraph(items: YarnWorkspacesListItem[]): Graphs {
+  private static buildGraph(items: YarnWorkspacesListItem[]): Graphs {
     const graphById: Graph = {}
     const dirToId: Record<string, string> = {}
 

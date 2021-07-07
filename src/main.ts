@@ -8,7 +8,7 @@ import {YarnGraph} from './graph'
 const rootWorkspace = fs.read(path.join(__dirname, "../package.json"), 'json').name
 const subPackageRegex = /-(serverside|widgets|frontend)$/
 
-export const normalize = (targetWorkspaces: string[]) => {
+export const normalize = (targetWorkspaces: string[]): string[] => {
   const filtered = new Set<string>([]);
 
   for (const ws of targetWorkspaces) {
