@@ -11,7 +11,7 @@
     "format-check": "yarn prettier --check **/*.ts",
     "lint": "yarn exec eslint '**/*.ts'",
     "package": "yarn ncc build --source-map --license licenses.txt",
-    "test": "yarn jest --testLocationInResults",
+    "test": "yarn jest",
     "all": "yarn build && yarn format && yarn lint && yarn package && yarn test",
     "postinstall": "yarn husky install"
   },

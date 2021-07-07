@@ -28,8 +28,14 @@ jobs:
         env:
           CI: true
 
-      - name: Yarn run all
-        run: yarn run all
+      - name: Format
+        run: yarn format
+      - name: Lint
+        run: yarn lint
+      - name: Package
+        run: yarn package
+      - name: Test
+        run: yarn test
 
   smoke-test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
