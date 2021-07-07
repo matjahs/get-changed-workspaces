@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "description": "TypeScript template action",
-  "main": "lib/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "yarn tsc -p .",
     "format": "yarn prettier --write **/*.ts",
