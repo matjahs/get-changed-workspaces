@@ -37,7 +37,7 @@ export class YarnGraph {
         const node = this.graph.byId[id]
         if (!node) {
           core.setFailed(`Workspace '${id}' not registered in root worktree`)
-          return [];
+          return []
         }
         resultSet.add(id)
         for (const dependent of node.dependents) {
