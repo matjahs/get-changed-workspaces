@@ -3,7 +3,7 @@ import path from 'path'
 import * as core from '@actions/core'
 import pkgDir from 'pkg-dir'
 
-import {YarnWorkspacesListItem} from './list'
+import {YarnWorkspacesListItem} from './list-workspaces'
 
 interface GraphNode {
   workspaceId: string
@@ -40,6 +40,7 @@ export class YarnGraph {
           console.error(`Workspace '${id}' not registered in root worktree`)
           continue
         }
+        resultSet.add(id)
         for (const dependent of node.dependents) {
           core.info(`${dependent} depends on ${node.workspaceId}`)
         }
@@ -78,9 +79,12 @@ export class YarnGraph {
   }
 
   private getWorkspaceId(dir: string): string {
+    console.log(`trying to get workspace ID of dir: `, dir)
     const id = this.graph.byDir[path.resolve(dir)]?.workspaceId
     if (!id) {
-      throw new Error(`Workspace at '${dir}' not registered in root worktree`)
+      throw new Error(
+        `Workspace at '${dir}' not registered in root worktree`
+      )
     }
     return id
   }
@@ -118,5 +122,3 @@ export class YarnGraph {
     return {byId: graphById, byDir: graphByDir}
   }
 }
-
-export default YarnGraph
