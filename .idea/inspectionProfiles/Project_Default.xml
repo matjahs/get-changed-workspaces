@@ -1,0 +1,111 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HttpUrlsUsage" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredUrls">
+        <list>
+          <option value="http://localhost" />
+          <option value="http://127.0.0.1" />
+          <option value="http://0.0.0.0" />
+          <option value="http://www.w3.org/" />
+          <option value="http://json-schema.org/draft" />
+          <option value="http://java.sun.com/" />
+          <option value="http://xmlns.jcp.org/" />
+          <option value="http://javafx.com/javafx/" />
+          <option value="http://javafx.com/fxml" />
+          <option value="http://maven.apache.org/xsd/" />
+          <option value="http://maven.apache.org/POM/" />
+          <option value="http://www.springframework.org/schema/" />
+          <option value="http://www.springframework.org/tags" />
+          <option value="http://www.springframework.org/security/tags" />
+          <option value="http://www.thymeleaf.org" />
+          <option value="http://www.jboss.org/j2ee/schema/" />
+          <option value="http://www.jboss.com/xml/ns/" />
+          <option value="http://www.ibm.com/webservices/xsd" />
+          <option value="http://activemq.apache.org/schema/" />
+          <option value="http://schema.cloudfoundry.org/spring/" />
+          <option value="http://schemas.xmlsoap.org/" />
+          <option value="http://cxf.apache.org/schemas/" />
+          <option value="http://primefaces.org/ui" />
+          <option value="http://tiles.apache.org/" />
+          <option value="http://169.254.169.254" />
+          <option value="http://{IP}" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E501" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="salt._grains.metadatagrain.__opts__" />
+          <option value="salt.auth.alcali.__opts__" />
+          <option value="salt._returners.alcali.__opts__" />
+          <option value="salt._returners.alcali.__salt__" />
+          <option value="salt._returners.alcali.__context__" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="RubyInterpreter" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="RubyResolve" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="warnImplicitResults" value="false" />
+    </inspection_tool>
+    <inspection_tool class="SqlNoDataSourceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SqlResolveInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="YAMLDuplicatedKeys" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoCipherInsecureAsymmetricCryptographicAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoKeyAgreementGuideonApprovedCryptographicAlgorithm" enabled="true" level="SENSEI MARKED INFO" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoKeyAgreementInsecureCryptographicAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoKeyPairGenerationApprovedStandardCryptographicAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoKeyPairGenerationInsecureCryptographicAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoKeyPairGenerationNonStandardCryptographicAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoSignatureApprovedHashingAlgorithm" enabled="true" level="SENSEI MARKED INFO" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoSignatureInsecureHashingAlgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_CryptoSignatureNonStandardHashingAlgorithm" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataInjectionParameterizeLDAPFiltersDirContextsearch" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidbruteforcingUsesufficientlylongkeysizeskeyGenerator" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatekeypairgenerationalgorithminsecure" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatekeypairgenerationalgorithmnotrecommended" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmDESfamily" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmHmacfamily" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmHmacfamily1" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmOtheralgorithms" enabled="true" level="SENSEI MARKED INFO" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithminsecureSecretKeyFactory" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmnotrecommendedSecretKeyFactory" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUseappropriatesecretkeygenerationalgorithmotherSecretKeyFactory" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUsestrongsymmetriccryptographicalgorithm" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUsesufficientlylongkeysizeskeyGeneratorbadvalue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUsesufficientlylongkeysizeskeyPairGenerator" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-CryptographyAvoidcryptographicweaknessUsesufficientlylongkeysizeskeyPairGeneratorbadvalue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_DataProtection-SecureDataStorageAvoiddataexposureUseCipherinsteadofNullCipher" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidCodeInjectionUseSafeConstructor1stargumentoftypeConstructor" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidCodeInjectionUseSafeConstructorargumentsbutnoConstructorargument" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidCodeInjectionUseSafeConstructornoarguments" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidSQLInjectionUseParameterizedQueriesPreparedStatement" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidSQLInjectionUseParameterizedQueriesStatement" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidXMLInjectionUsesetFeature" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidXMLInjectionUsesetSchema" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InjectionAvoidXMLInjectionsetFeaturewithbadvalue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InputValidationAvoidXXEDonotsetDocumentBuilderFactoryexternal-parameter-entitiestotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InputValidationAvoidXXEDonotsetDocumentBuilderFactoryload-external-dtdtotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InputValidationAvoidXXEDonotsetDocumentBuilderFactorysetExpandEntityReferencestotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InputValidationAvoidXXEDonotsetDocumentBuilderFactorysetXIncludeAwaretotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_InputValidationAvoidXXEDonotsetXMLInputFactoryPropertytotrue" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_PortabilityFlawAvoidlocaledependentcomparisonsequalsaftercaseconversion" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_TLSWeakEncryptionInsecureVersion" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_TLSWeakEncryptionOutdatedVersion" enabled="true" level="SENSEI WARNING" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetExpandEntityReferencestofalse" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetFeaturedissallow-doctype-decl" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetFeaturedissallow-doctype-declwrongboolean" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetFeatureexternal-parameter-entitiesshouldbesetfirst" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetFeatureload-external-dtd" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesDocumentBuilderFactorysetXIncludeAware" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesXMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+    <inspection_tool class="fcd36335-ac86-4bef-8d30-062d8aae0364_XMLExternalEntitiesXMLInputFactory.SUPPORT_DTD" enabled="true" level="SENSEI ERROR" enabled_by_default="true" />
+  </profile>
+</component>
