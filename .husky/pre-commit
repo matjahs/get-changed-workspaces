@@ -2,5 +2,5 @@
 # shellcheck source=.husky/_/husky.sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn run test
-yarn install
+npm run test
+
