@@ -1,19 +1,48 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import fs from 'fs-jetpack'
+import * as path from 'path'
 
-async function run(): Promise<void> {
+import listYarnWorkspaces from './list-workspaces'
+import {YarnGraph} from './graph'
+
+const rootWorkspace = fs.read(path.join(__dirname, '../package.json'), 'json')
+  .name
+const subPackageRegex = /-(serverside|widgets|frontend)$/
+
+export const normalize = (targetWorkspaces: string[]): string[] => {
+  const filtered = new Set<string>([])
+
+  for (const ws of targetWorkspaces) {
+    filtered.add(ws.replace(subPackageRegex, ''))
+  }
+
+  return Array.from(filtered).filter(ws => ws !== rootWorkspace)
+}
+
+export const main = async (): Promise<void> => {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const input = core.getInput('files')
+    const files: string[] = JSON.parse(input)
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    core.info('Building worktree dependency graph')
+    const graph = new YarnGraph(await listYarnWorkspaces())
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    core.setFailed(error.message)
+    core.startGroup('Identifying directly modified workspaces')
+    const changedWorkspaces = await graph.getWorkspacesForFiles(...files)
+    core.endGroup()
+    core.info(`Affected workspaces [${changedWorkspaces.join(', ')}]`)
+
+    core.startGroup('Identifying dependent workspaces')
+    const targetWorkspaces = graph.getRecursiveDependents(...changedWorkspaces)
+    core.endGroup()
+    core.info(`Target workspaces [${targetWorkspaces.join(', ')}]`)
+
+    const normalizedWorkspaces = normalize(targetWorkspaces)
+
+    core.setOutput('targets', normalizedWorkspaces)
+  } catch (err) {
+    core.setFailed(err)
   }
 }
 
-run()
+main()
