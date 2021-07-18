@@ -166,19 +166,24 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const exec = __importStar(__webpack_require__(1514));
 const listYarnWorkspaces = () => __awaiter(void 0, void 0, void 0, function* () {
     const output = [];
-    yield exec.exec('yarn workspaces', ['list', '-v', '--json'], {
-        silent: true,
-        listeners: {
-            stdout: data => {
-                output.push(data);
+    try {
+        yield exec.exec('yarn workspaces', ['list', '-v', '--json'], {
+            silent: true,
+            listeners: {
+                stdout: data => {
+                    output.push(data);
+                }
             }
-        }
-    });
-    return output
-        .join('')
-        .trim()
-        .split('\n')
-        .map(str => JSON.parse(str));
+        });
+        return output
+            .join('')
+            .trim()
+            .split('\n')
+            .map(str => JSON.parse(str));
+    }
+    catch (err) {
+        return [];
+    }
 });
 exports.default = listYarnWorkspaces;
 

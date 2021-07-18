@@ -8,19 +8,23 @@ export interface YarnWorkspacesListItem {
 
 const listYarnWorkspaces = async (): Promise<YarnWorkspacesListItem[]> => {
   const output: Buffer[] = []
-  await exec.exec('yarn workspaces', ['list', '-v', '--json'], {
-    silent: true,
-    listeners: {
-      stdout: data => {
-        output.push(data)
+  try {
+    await exec.exec('yarn workspaces', ['list', '-v', '--json'], {
+      silent: true,
+      listeners: {
+        stdout: data => {
+          output.push(data)
+        }
       }
-    }
-  })
-  return output
-    .join('')
-    .trim()
-    .split('\n')
-    .map(str => JSON.parse(str))
+    })
+    return output
+      .join('')
+      .trim()
+      .split('\n')
+      .map(str => JSON.parse(str))
+  } catch (err) {
+    return []
+  }
 }
 
 export default listYarnWorkspaces
