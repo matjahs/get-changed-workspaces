@@ -57,9 +57,7 @@ export class YarnGraph {
       await Promise.all(
         files.map(async file => {
           const workspaceDir = await pkgDir(path.dirname(path.resolve(file)))
-          if (workspaceDir !== undefined) {
-            core.info(`Found workspace '${workspaceDir}' for file '${file}'`)
-          } else {
+          if (workspaceDir === undefined) {
             core.warning(`Workspace not found for file '${file}'`)
           }
           return workspaceDir
@@ -70,7 +68,6 @@ export class YarnGraph {
     for (const workspaceDir of workspaceDirs) {
       if (workspaceDir === undefined) continue
       const workspaceId = this.getWorkspaceId(workspaceDir)
-      core.info(`Workspace '${workspaceDir}' identified as ${workspaceId}`)
       resultSet.add(workspaceId)
     }
 

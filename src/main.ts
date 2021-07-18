@@ -5,8 +5,10 @@ import * as path from 'path'
 import listYarnWorkspaces from './list-workspaces'
 import {YarnGraph} from './graph'
 
-const rootWorkspace = fs.read(path.join(__dirname, '../package.json'), 'json')
-  .name
+const filepath = path.join(__dirname, '../package.json')
+const pkg = fs.read(filepath, 'json')
+const rootWorkspace = pkg.name
+
 const subPackageRegex = /-(serverside|widgets|frontend)$/
 
 export const normalize = (targetWorkspaces: string[]): string[] => {
