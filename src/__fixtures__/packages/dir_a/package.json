@@ -2,9 +2,12 @@
   "name": "pkg_a",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/file_a.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "pkg_b": "1.0.0"
   },
   "keywords": [],
   "author": "",

@@ -1,8 +1,8 @@
 {
-  "name": "pkg_b",
+  "name": "pkg_c",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/file_c.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
