@@ -57,6 +57,15 @@ const normalize = (targetWorkspaces) => {
     return Array.from(filtered);
 };
 exports.normalize = normalize;
+const dedupe = (workspaces) => {
+    const result = new Set([]);
+    for (const ws of workspaces) {
+        if (!result.has(ws)) {
+            result.add(ws);
+        }
+    }
+    return Array.from(result);
+};
 const main = async () => {
     try {
         const input = core.getInput("files");
@@ -64,20 +73,25 @@ const main = async () => {
         core.info("Building worktree dependency graph");
         const project = await workspaces_1.getProject(process.cwd());
         core.startGroup("Identifying directly modified workspaces");
-        const changedWorkspaces = await workspaces_1.getWorkspacesForFiles(project, ...files);
+        let changedWorkspaces = await workspaces_1.getWorkspacesForFiles(project, ...files);
+        changedWorkspaces = dedupe(changedWorkspaces);
         core.endGroup();
-        core.info(`Affected workspaces [${changedWorkspaces.join(", ")}]`);
+        core.info(`Affected workspaces [${changedWorkspaces
+            .map(ws => ws.computeCandidateName())
+            .join(", ")}]`);
         core.startGroup("Identifying dependent workspaces");
-        const deps = [];
+        let deps = [];
         for (const changedWorkspace of changedWorkspaces) {
             const dependers = await workspaces_1.getDependers(project, changedWorkspace);
             deps.push(...dependers);
         }
+        deps = dedupe(deps);
         core.info(`Target workspaces [
     ${deps.join("\n")}
     ]`);
         core.endGroup();
-        const normalizedWorkspaces = exports.normalize([...changedWorkspaces, ...deps]);
+        const combined = dedupe([...changedWorkspaces, ...deps]);
+        const normalizedWorkspaces = exports.normalize(combined);
         core.setOutput("targets", normalizedWorkspaces);
     }
     catch (err) {

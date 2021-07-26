@@ -41,6 +41,16 @@ export const normalize = (targetWorkspaces: Workspace[]): string[] => {
   return Array.from(filtered);
 };
 
+const dedupe = (workspaces: Workspace[]): Workspace[] => {
+  const result = new Set<Workspace>([]);
+  for (const ws of workspaces) {
+    if (!result.has(ws)) {
+      result.add(ws);
+    }
+  }
+  return Array.from(result);
+};
+
 export const main = async (): Promise<void> => {
   try {
     const input = core.getInput("files");
@@ -50,23 +60,30 @@ export const main = async (): Promise<void> => {
     const project = await getProject(process.cwd());
 
     core.startGroup("Identifying directly modified workspaces");
-    const changedWorkspaces = await getWorkspacesForFiles(project, ...files);
+    let changedWorkspaces = await getWorkspacesForFiles(project, ...files);
+    changedWorkspaces = dedupe(changedWorkspaces);
     core.endGroup();
-    core.info(`Affected workspaces [${changedWorkspaces.join(", ")}]`);
+    core.info(
+      `Affected workspaces [${changedWorkspaces
+        .map(ws => ws.computeCandidateName())
+        .join(", ")}]`
+    );
 
     core.startGroup("Identifying dependent workspaces");
-    const deps: Workspace[] = [];
+    let deps: Workspace[] = [];
     for (const changedWorkspace of changedWorkspaces) {
       const dependers = await getDependers(project, changedWorkspace);
       deps.push(...dependers);
     }
+    deps = dedupe(deps);
 
     core.info(`Target workspaces [
     ${deps.join("\n")}
     ]`);
     core.endGroup();
 
-    const normalizedWorkspaces: string[] = normalize([...changedWorkspaces, ...deps]);
+    const combined = dedupe([...changedWorkspaces, ...deps]);
+    const normalizedWorkspaces: string[] = normalize(combined);
 
     core.setOutput("targets", normalizedWorkspaces);
   } catch (err) {
