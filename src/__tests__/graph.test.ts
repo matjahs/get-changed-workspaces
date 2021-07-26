@@ -7,6 +7,7 @@ import {
   getWorkspaceByFilepath
 } from "../utils/workspaces";
 import {normalize} from "../main";
+import "jest-extended";
 
 const ROOT_DIR = path.resolve(__dirname, "../__fixtures__");
 const PACKAGES_DIR = path.join(ROOT_DIR, "packages");
@@ -53,18 +54,18 @@ describe("utils", () => {
 
     it("identifies pkg_b as a dependency of pkg_a", async () => {
       const dependent = getWorkspace(project, "pkg_b");
-      const dependee = getWorkspace(project, "pkg_a");
 
       const deps = await getDependers(project, dependent);
-      expect(deps).toEqual([dependee.locator]);
+      expect(deps).toBeArrayOfSize(1);
+      expect(deps[0].manifest.raw).toContainEntry(["name", "pkg_a"]);
     });
 
     it("identifies pkg_c as a dependency of pkg_b", async () => {
       const dependent = getWorkspace(project, "pkg_c");
-      const dependee = getWorkspace(project, "pkg_b");
 
       const deps = await getDependers(project, dependent);
-      expect(deps).toEqual([dependee.locator]);
+      expect(deps).toBeArrayOfSize(1);
+      expect(deps[0].manifest.raw).toContainEntry(["name", "pkg_b"]);
     });
   });
 

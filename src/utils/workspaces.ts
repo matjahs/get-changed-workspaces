@@ -1,5 +1,5 @@
 import {npath, PortablePath} from "@yarnpkg/fslib";
-import {Configuration, Locator, Project, Workspace} from "@yarnpkg/core";
+import {Configuration, Project, Workspace} from "@yarnpkg/core";
 import * as core from "@actions/core";
 import pkgUp from "pkg-up";
 
@@ -46,14 +46,14 @@ export const getWorkspace = (project: Project, name: string): Workspace => {
 export const getDependers = async (
   project: Project,
   dependee: Workspace
-): Promise<Locator[]> => {
+): Promise<Workspace[]> => {
   core.startGroup(
     `resolving workspaces (dependers) that depend on dependee ${dependee.computeCandidateName()}`
   );
   const dependers = [];
   for (const ws of project.workspaces) {
     if (ws.manifest.hasConsumerDependency(dependee.locator)) {
-      dependers.push(ws.locator);
+      dependers.push(ws);
     }
   }
   return dependers;
@@ -76,6 +76,15 @@ export const getWorkspaceByFilepath = async (
   core.info(`${file}-->${ws.locator.name}`);
 
   return ws;
+};
+
+export const getWorkspacesForFiles = async (
+  project: Project,
+  ...files: string[]
+): Promise<Workspace[]> => {
+  return await Promise.all(
+    files.map(async file => getWorkspaceByFilepath(project, file))
+  );
 };
 
 // export class WorkspaceUtil {

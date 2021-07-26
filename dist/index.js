@@ -1,140 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 4972:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.YarnGraph = void 0;
-const path_1 = __importDefault(__nccwpck_require__(5622));
-const core = __importStar(__nccwpck_require__(2186));
-const pkg_up_1 = __importDefault(__nccwpck_require__(4586));
-class YarnGraph {
-    constructor(workspaceList) {
-        // workspaceList[0].project.getWorkspaceByFilePath();
-        this.graph = YarnGraph.buildGraph(workspaceList);
-    }
-    getRecursiveDependents(...initialIds) {
-        const resultSet = new Set();
-        // breadth-first search
-        const queue = [...initialIds];
-        for (const id of queue) {
-            if (!resultSet.has(id)) {
-                resultSet.add(id);
-                const node = this.graph.byId[id];
-                if (!node) {
-                    core.setFailed(`Workspace '${id}' not registered in root worktree`);
-                    return [];
-                }
-                resultSet.add(id);
-                for (const dependent of node.dependents) {
-                    core.info(`${dependent} depends on ${node.workspaceId}`);
-                }
-                // @ts-expect-error Argument of type '[IdentHash, Descriptor]' is not assignable to parameter of type 'string
-                queue.push(...node.dependents);
-            }
-        }
-        return [...resultSet];
-    }
-    async getWorkspacesForFiles(...files) {
-        const resultSet = new Set();
-        const workspaceDirs = new Set(await Promise.all(files.map(async (file) => {
-            const workspaceDir = await pkg_up_1.default({ cwd: path_1.default.dirname(path_1.default.resolve(file)) });
-            if (workspaceDir === undefined || workspaceDir === null) {
-                core.warning(`Workspace not found for file '${file}'`);
-            }
-            return workspaceDir;
-        })));
-        for (const workspaceDir of workspaceDirs) {
-            if (workspaceDir === undefined || workspaceDir === null)
-                continue;
-            const workspaceId = this.getWorkspaceId(workspaceDir);
-            resultSet.add(workspaceId);
-        }
-        return [...resultSet];
-    }
-    getWorkspaceId(dir) {
-        var _a;
-        const id = (_a = this.graph.byDir[path_1.default.resolve(dir)]) === null || _a === void 0 ? void 0 : _a.workspaceId;
-        if (!id) {
-            core.setFailed(`Workspace at '${dir}' not registered in root worktree`);
-            return "";
-        }
-        return id;
-    }
-    static buildGraph(items) {
-        const graphById = {};
-        const dirToId = {};
-        // build initial graph with dependency links
-        for (const item of items) {
-            const node = (graphById[item.locator.name] = {
-                workspaceId: item.locator.name,
-                workspaceDir: item.relativeCwd,
-                dependencies: item.dependencies,
-                dependents: new Map([])
-            });
-            dirToId[node.workspaceDir] = node.workspaceId;
-        }
-        // build the reverse dependency links
-        for (const item of items) {
-            const name = item.locator.name;
-            for (const depLocation of item.dependencies) {
-                // @ts-expect-error Argument of type '[IdentHash, Descriptor]' is not assignable to parameter of type 'string'.
-                graphById[dirToId[path_1.default.resolve(depLocation)]].dependents.push(name);
-            }
-        }
-        // populate the graph with directory lookup too
-        const graphByDir = {};
-        for (const node of Object.values(graphById)) {
-            graphByDir[node.workspaceDir] = node;
-        }
-        return { byId: graphById, byDir: graphByDir };
-    }
-}
-exports.YarnGraph = YarnGraph;
-
-
-/***/ }),
-
-/***/ 7995:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const workspaces_1 = __nccwpck_require__(3707);
-const listYarnWorkspaces = async () => {
-    return await workspaces_1.getPluginWorkspaces();
-};
-exports.default = listYarnWorkspaces;
-
-
-/***/ }),
-
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -159,14 +25,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = exports.normalize = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const list_workspaces_1 = __importDefault(__nccwpck_require__(7995));
-const graph_1 = __nccwpck_require__(4972);
+const workspaces_1 = __nccwpck_require__(3707);
 const subPackageRegex = /-(serverside|widgets|frontend)$/;
 const ROOT_WORKSPACES = ["plugins", "get-changed-workspaces"];
 const isRootWorkspace = (name) => {
@@ -180,7 +42,9 @@ const normalize = (targetWorkspaces) => {
     for (const ws of targetWorkspaces) {
         filtered.add(ws.replace(subPackageRegex, ""));
     }
-    const withoutRoot = Array.from(filtered).filter(ws => !isRootWorkspace(ws));
+    const withoutRoot = Array.from(filtered)
+        .filter(ws => !isRootWorkspace(ws))
+        .filter(ws => ws !== "");
     core.endGroup();
     return withoutRoot;
 };
@@ -190,16 +54,26 @@ const main = async () => {
         const input = core.getInput("files");
         const files = JSON.parse(input);
         core.info("Building worktree dependency graph");
-        const graph = new graph_1.YarnGraph(await list_workspaces_1.default());
+        const project = await workspaces_1.getProject(process.cwd());
         core.startGroup("Identifying directly modified workspaces");
-        const changedWorkspaces = await graph.getWorkspacesForFiles(...files);
+        const changedWorkspaces = await workspaces_1.getWorkspacesForFiles(project, ...files);
         core.endGroup();
         core.info(`Affected workspaces [${changedWorkspaces.join(", ")}]`);
         core.startGroup("Identifying dependent workspaces");
-        const targetWorkspaces = graph.getRecursiveDependents(...changedWorkspaces);
-        core.info(`Target workspaces [${targetWorkspaces.join(", ")}]`);
+        const deps = [];
+        for (const changedWorkspace of changedWorkspaces) {
+            const x = await workspaces_1.getDependers(project, changedWorkspace);
+            deps.concat(x);
+        }
+        // const targetWorkspaces: Workspace[] = await Promise.all(
+        //   changedWorkspaces.map(async ws => getDependers(project, ws))
+        // );
+        core.info(`Target workspaces [${deps.join(", ")}]`);
         core.endGroup();
-        const normalizedWorkspaces = exports.normalize(targetWorkspaces);
+        const normalizedWorkspaces = exports.normalize([
+            ...changedWorkspaces.map(ws => ws.locator.name),
+            ...deps.map(dep => dep.locator.name)
+        ]);
         core.setOutput("targets", normalizedWorkspaces);
     }
     catch (err) {
@@ -240,7 +114,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkspaceByFilepath = exports.getDependers = exports.getWorkspace = exports.getProject = exports.getPluginWorkspaces = exports.isPluginCwd = void 0;
+exports.getWorkspacesForFiles = exports.getWorkspaceByFilepath = exports.getDependers = exports.getWorkspace = exports.getProject = exports.getPluginWorkspaces = exports.isPluginCwd = void 0;
 const fslib_1 = __nccwpck_require__(9374);
 const core_1 = __nccwpck_require__(7284);
 const core = __importStar(__nccwpck_require__(2186));
@@ -278,7 +152,7 @@ const getDependers = async (project, dependee) => {
     const dependers = [];
     for (const ws of project.workspaces) {
         if (ws.manifest.hasConsumerDependency(dependee.locator)) {
-            dependers.push(ws.locator);
+            dependers.push(ws);
         }
     }
     return dependers;
@@ -297,6 +171,10 @@ const getWorkspaceByFilepath = async (project, file) => {
     return ws;
 };
 exports.getWorkspaceByFilepath = getWorkspaceByFilepath;
+const getWorkspacesForFiles = async (project, ...files) => {
+    return await Promise.all(files.map(async (file) => exports.getWorkspaceByFilepath(project, file)));
+};
+exports.getWorkspacesForFiles = getWorkspacesForFiles;
 // export class WorkspaceUtil {
 //   #dir: PortablePath;
 //   #config: Configuration;

@@ -1,7 +1,6 @@
 import * as core from "@actions/core";
-
-import listYarnWorkspaces from "./list-workspaces";
-import {YarnGraph} from "./graph";
+import {getDependers, getProject, getWorkspacesForFiles} from "./utils/workspaces";
+import {Workspace} from "@yarnpkg/core";
 
 const subPackageRegex = /-(serverside|widgets|frontend)$/;
 
@@ -21,7 +20,9 @@ export const normalize = (targetWorkspaces: string[]): string[] => {
     filtered.add(ws.replace(subPackageRegex, ""));
   }
 
-  const withoutRoot = Array.from(filtered).filter(ws => !isRootWorkspace(ws));
+  const withoutRoot = Array.from(filtered)
+    .filter(ws => !isRootWorkspace(ws))
+    .filter(ws => ws !== "");
   core.endGroup();
   return withoutRoot;
 };
@@ -32,19 +33,29 @@ export const main = async (): Promise<void> => {
     const files: string[] = JSON.parse(input);
 
     core.info("Building worktree dependency graph");
-    const graph = new YarnGraph(await listYarnWorkspaces());
+    const project = await getProject(process.cwd());
 
     core.startGroup("Identifying directly modified workspaces");
-    const changedWorkspaces = await graph.getWorkspacesForFiles(...files);
+    const changedWorkspaces = await getWorkspacesForFiles(project, ...files);
     core.endGroup();
     core.info(`Affected workspaces [${changedWorkspaces.join(", ")}]`);
 
     core.startGroup("Identifying dependent workspaces");
-    const targetWorkspaces = graph.getRecursiveDependents(...changedWorkspaces);
-    core.info(`Target workspaces [${targetWorkspaces.join(", ")}]`);
+    const deps: Workspace[] = [];
+    for (const changedWorkspace of changedWorkspaces) {
+      const x = await getDependers(project, changedWorkspace);
+      deps.concat(x);
+    }
+    // const targetWorkspaces: Workspace[] = await Promise.all(
+    //   changedWorkspaces.map(async ws => getDependers(project, ws))
+    // );
+    core.info(`Target workspaces [${deps.join(", ")}]`);
     core.endGroup();
 
-    const normalizedWorkspaces = normalize(targetWorkspaces);
+    const normalizedWorkspaces: string[] = normalize([
+      ...changedWorkspaces.map(ws => ws.locator.name),
+      ...deps.map(dep => dep.locator.name)
+    ]);
 
     core.setOutput("targets", normalizedWorkspaces);
   } catch (err) {
