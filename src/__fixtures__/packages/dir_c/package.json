@@ -1,5 +1,5 @@
 {
-  "name": "pkg_c",
+  "name": "@foo/pkg_c",
   "version": "1.0.0",
   "description": "",
   "main": "src/file_c.js",

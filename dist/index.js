@@ -70,8 +70,8 @@ const main = async () => {
     ]`);
         core.endGroup();
         const normalizedWorkspaces = exports.normalize([
-            ...changedWorkspaces.map(ws => ws.locator.name),
-            ...deps.map(dep => dep.locator.name)
+            ...changedWorkspaces.map(ws => ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name),
+            ...deps.map(dep => dep.locator.scope ? `@${dep.locator.scope}/${dep.locator.name}` : dep.locator.name)
         ]);
         core.setOutput("targets", normalizedWorkspaces);
     }

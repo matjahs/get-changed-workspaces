@@ -53,8 +53,12 @@ export const main = async (): Promise<void> => {
     core.endGroup();
 
     const normalizedWorkspaces: string[] = normalize([
-      ...changedWorkspaces.map(ws => ws.locator.name),
-      ...deps.map(dep => dep.locator.name)
+      ...changedWorkspaces.map(ws =>
+        ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name
+      ),
+      ...deps.map(dep =>
+        dep.locator.scope ? `@${dep.locator.scope}/${dep.locator.name}` : dep.locator.name
+      )
     ]);
 
     core.setOutput("targets", normalizedWorkspaces);

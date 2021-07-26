@@ -1,5 +1,5 @@
 {
-  "name": "pkg_a",
+  "name": "@foo/pkg_a",
   "version": "1.0.0",
   "description": "",
   "main": "src/file_a.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "pkg_b": "1.0.0"
+    "@foo/pkg_b": "1.0.0"
   },
   "keywords": [],
   "author": "",

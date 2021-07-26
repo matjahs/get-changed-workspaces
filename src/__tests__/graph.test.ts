@@ -57,7 +57,7 @@ describe("utils", () => {
 
       const deps = await getDependers(project, dependent);
       expect(deps).toBeArrayOfSize(1);
-      expect(deps[0].manifest.raw).toContainEntry(["name", "pkg_a"]);
+      expect(deps[0].manifest.raw).toContainEntry(["name", "@foo/pkg_a"]);
     });
 
     it("identifies pkg_c as a dependency of pkg_b", async () => {
@@ -65,7 +65,7 @@ describe("utils", () => {
 
       const deps = await getDependers(project, dependent);
       expect(deps).toBeArrayOfSize(1);
-      expect(deps[0].manifest.raw).toContainEntry(["name", "pkg_b"]);
+      expect(deps[0].manifest.raw).toContainEntry(["name", "@foo/pkg_b"]);
     });
   });
 

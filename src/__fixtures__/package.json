@@ -1,5 +1,5 @@
 {
-  "name": "root",
+  "name": "@foo/root",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
