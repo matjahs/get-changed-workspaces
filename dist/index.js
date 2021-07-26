@@ -39,13 +39,16 @@ const normalize = (targetWorkspaces) => {
     core.startGroup("normalizing...");
     const filtered = new Set([]);
     for (const ws of targetWorkspaces) {
-        if (/-(serverside|widgets|frontend)$/.test(ws.relativeCwd)) {
+        if (/-(serverside|widgets|frontend)$/.test(ws.locator.name)) {
+            core.info(`${ws.computeCandidateName()} end in serverside/widgets/frontend, skipping...`);
             continue;
         }
         if (!/^(plugins|apps)\//.test(ws.relativeCwd)) {
+            core.info(`${ws.relativeCwd} does not start with either plugins/ or apps/, skipping...`);
             continue;
         }
         if (isRootWorkspace(ws.locator.name)) {
+            core.info(`${ws.computeCandidateName()} is a root workspace, skipping...`);
             continue;
         }
         filtered.add(ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name);

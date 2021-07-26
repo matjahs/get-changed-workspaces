@@ -15,13 +15,20 @@ export const normalize = (targetWorkspaces: Workspace[]): string[] => {
   const filtered = new Set<string>([]);
 
   for (const ws of targetWorkspaces) {
-    if (/-(serverside|widgets|frontend)$/.test(ws.relativeCwd)) {
+    if (/-(serverside|widgets|frontend)$/.test(ws.locator.name)) {
+      core.info(
+        `${ws.computeCandidateName()} end in serverside/widgets/frontend, skipping...`
+      );
       continue;
     }
     if (!/^(plugins|apps)\//.test(ws.relativeCwd)) {
+      core.info(
+        `${ws.relativeCwd} does not start with either plugins/ or apps/, skipping...`
+      );
       continue;
     }
     if (isRootWorkspace(ws.locator.name)) {
+      core.info(`${ws.computeCandidateName()} is a root workspace, skipping...`);
       continue;
     }
 
