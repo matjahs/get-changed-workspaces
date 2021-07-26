@@ -43,13 +43,13 @@ export const main = async (): Promise<void> => {
     core.startGroup("Identifying dependent workspaces");
     const deps: Workspace[] = [];
     for (const changedWorkspace of changedWorkspaces) {
-      const x = await getDependers(project, changedWorkspace);
-      deps.concat(x);
+      const dependers = await getDependers(project, changedWorkspace);
+      deps.push(...dependers);
     }
-    // const targetWorkspaces: Workspace[] = await Promise.all(
-    //   changedWorkspaces.map(async ws => getDependers(project, ws))
-    // );
-    core.info(`Target workspaces [${deps.join(", ")}]`);
+
+    core.info(`Target workspaces [
+    ${deps.join("\n")}
+    ]`);
     core.endGroup();
 
     const normalizedWorkspaces: string[] = normalize([
