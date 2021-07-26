@@ -2,9 +2,7 @@ import * as core from "@actions/core";
 import {getDependers, getProject, getWorkspacesForFiles} from "./utils/workspaces";
 import {Workspace} from "@yarnpkg/core";
 
-const subPackageRegex = /-(serverside|widgets|frontend)$/;
-
-const ROOT_WORKSPACES = ["plugins", "get-changed-workspaces"];
+const ROOT_WORKSPACES = ["plugins", "get-changed-workspaces", ""];
 
 const isRootWorkspace = (name: string): boolean => {
   const isRoot = ROOT_WORKSPACES.includes(name);
@@ -12,19 +10,28 @@ const isRootWorkspace = (name: string): boolean => {
   return ROOT_WORKSPACES.includes(name);
 };
 
-export const normalize = (targetWorkspaces: string[]): string[] => {
+export const normalize = (targetWorkspaces: Workspace[]): string[] => {
   core.startGroup("normalizing...");
   const filtered = new Set<string>([]);
 
   for (const ws of targetWorkspaces) {
-    filtered.add(ws.replace(subPackageRegex, ""));
+    if (/-(serverside|widgets|frontend)$/.test(ws.relativeCwd)) {
+      continue;
+    }
+    if (!/^(plugins|apps)\//.test(ws.relativeCwd)) {
+      continue;
+    }
+    if (isRootWorkspace(ws.locator.name)) {
+      continue;
+    }
+
+    filtered.add(
+      ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name
+    );
   }
 
-  const withoutRoot = Array.from(filtered)
-    .filter(ws => !isRootWorkspace(ws))
-    .filter(ws => ws !== "");
   core.endGroup();
-  return withoutRoot;
+  return Array.from(filtered);
 };
 
 export const main = async (): Promise<void> => {
@@ -52,14 +59,7 @@ export const main = async (): Promise<void> => {
     ]`);
     core.endGroup();
 
-    const normalizedWorkspaces: string[] = normalize([
-      ...changedWorkspaces.map(ws =>
-        ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name
-      ),
-      ...deps.map(dep =>
-        dep.locator.scope ? `@${dep.locator.scope}/${dep.locator.name}` : dep.locator.name
-      )
-    ]);
+    const normalizedWorkspaces: string[] = normalize([...changedWorkspaces, ...deps]);
 
     core.setOutput("targets", normalizedWorkspaces);
   } catch (err) {

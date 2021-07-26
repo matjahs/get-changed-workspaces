@@ -29,8 +29,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = exports.normalize = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const workspaces_1 = __nccwpck_require__(3707);
-const subPackageRegex = /-(serverside|widgets|frontend)$/;
-const ROOT_WORKSPACES = ["plugins", "get-changed-workspaces"];
+const ROOT_WORKSPACES = ["plugins", "get-changed-workspaces", ""];
 const isRootWorkspace = (name) => {
     const isRoot = ROOT_WORKSPACES.includes(name);
     core.debug(`${name} is ${isRoot ? "" : "not "}a root workspace`);
@@ -40,13 +39,19 @@ const normalize = (targetWorkspaces) => {
     core.startGroup("normalizing...");
     const filtered = new Set([]);
     for (const ws of targetWorkspaces) {
-        filtered.add(ws.replace(subPackageRegex, ""));
+        if (/-(serverside|widgets|frontend)$/.test(ws.relativeCwd)) {
+            continue;
+        }
+        if (!/^(plugins|apps)\//.test(ws.relativeCwd)) {
+            continue;
+        }
+        if (isRootWorkspace(ws.locator.name)) {
+            continue;
+        }
+        filtered.add(ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name);
     }
-    const withoutRoot = Array.from(filtered)
-        .filter(ws => !isRootWorkspace(ws))
-        .filter(ws => ws !== "");
     core.endGroup();
-    return withoutRoot;
+    return Array.from(filtered);
 };
 exports.normalize = normalize;
 const main = async () => {
@@ -69,10 +74,7 @@ const main = async () => {
     ${deps.join("\n")}
     ]`);
         core.endGroup();
-        const normalizedWorkspaces = exports.normalize([
-            ...changedWorkspaces.map(ws => ws.locator.scope ? `@${ws.locator.scope}/${ws.locator.name}` : ws.locator.name),
-            ...deps.map(dep => dep.locator.scope ? `@${dep.locator.scope}/${dep.locator.name}` : dep.locator.name)
-        ]);
+        const normalizedWorkspaces = exports.normalize([...changedWorkspaces, ...deps]);
         core.setOutput("targets", normalizedWorkspaces);
     }
     catch (err) {

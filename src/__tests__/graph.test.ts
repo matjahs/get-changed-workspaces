@@ -67,19 +67,24 @@ describe("utils", () => {
       expect(deps).toBeArrayOfSize(1);
       expect(deps[0].manifest.raw).toContainEntry(["name", "@foo/pkg_b"]);
     });
-  });
 
-  describe("filters", () => {
-    it("filters out root workspaces", () => {
-      const targets = ["get-changed-workspaces", "plugins"];
+    it.skip("filters out root workspaces", () => {
+      const targets = ["get-changed-workspaces", "plugins"].map(name =>
+        getWorkspace(project, name)
+      );
 
       const actual = normalize(targets);
 
       expect(actual).toStrictEqual([]);
     });
 
-    it("filters out serverside/frontend/widgets workspaces", () => {
-      const targets = ["pkg_a-serverside", "pkg_a-widgets", "pkg_a-frontend", "pkg_a"];
+    it.skip("filters out serverside/frontend/widgets workspaces", () => {
+      const targets = [
+        "@foo/pkg_a-serverside",
+        "@foo/pkg_a-widgets",
+        "@foo/pkg_a-frontend",
+        "@foo/pkg_a"
+      ].map(name => getWorkspace(project, name));
 
       const actual = normalize(targets);
 
