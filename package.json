@@ -1,6 +1,6 @@
 {
   "name": "get-changed-workspaces",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "get-changed-workspaces",
   "main": "lib/main.js",
@@ -27,7 +27,6 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.4.0",
-    "@actions/exec": "^1.1.0",
     "@actions/github": "^5.0.0",
     "@yarnpkg/core": "^2.4.0",
     "@yarnpkg/fslib": "^2.4.0",
@@ -41,7 +40,6 @@
     "eslint": "^7.31.0",
     "eslint-plugin-github": "^4.1.5",
     "eslint-plugin-jest": "^24.4.0",
-    "execa": "^5.1.1",
     "fs-jetpack": "^4.1.0",
     "jest": "^27.0.6",
     "jest-circus": "^27.0.6",
