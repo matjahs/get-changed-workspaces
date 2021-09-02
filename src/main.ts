@@ -87,7 +87,9 @@ export const main = async (): Promise<void> => {
 
     core.setOutput("targets", normalizedWorkspaces);
   } catch (err) {
-    core.setFailed(err);
+    if (err instanceof Error) {
+      core.setFailed(err);
+    }
   }
 };
 

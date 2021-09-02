@@ -71,9 +71,9 @@ const main = async () => {
         const input = core.getInput("files");
         const files = JSON.parse(input);
         core.info("Building worktree dependency graph");
-        const project = await workspaces_1.getProject(process.cwd());
+        const project = await (0, workspaces_1.getProject)(process.cwd());
         core.startGroup("Identifying directly modified workspaces");
-        let changedWorkspaces = await workspaces_1.getWorkspacesForFiles(project, ...files);
+        let changedWorkspaces = await (0, workspaces_1.getWorkspacesForFiles)(project, ...files);
         changedWorkspaces = dedupe(changedWorkspaces);
         core.endGroup();
         core.info(`Affected workspaces [${changedWorkspaces
@@ -82,7 +82,7 @@ const main = async () => {
         core.startGroup("Identifying dependent workspaces");
         let deps = [];
         for (const changedWorkspace of changedWorkspaces) {
-            const dependers = await workspaces_1.getDependers(project, changedWorkspace);
+            const dependers = await (0, workspaces_1.getDependers)(project, changedWorkspace);
             deps.push(...dependers);
         }
         deps = dedupe(deps);
@@ -91,15 +91,17 @@ const main = async () => {
     ]`);
         core.endGroup();
         const combined = dedupe([...changedWorkspaces, ...deps]);
-        const normalizedWorkspaces = exports.normalize(combined);
+        const normalizedWorkspaces = (0, exports.normalize)(combined);
         core.setOutput("targets", normalizedWorkspaces);
     }
     catch (err) {
-        core.setFailed(err);
+        if (err instanceof Error) {
+            core.setFailed(err);
+        }
     }
 };
 exports.main = main;
-exports.main();
+(0, exports.main)();
 
 
 /***/ }),
@@ -147,7 +149,7 @@ const getPluginWorkspaces = async (exclude = ["plugins", "get-changed-workspaces
     const dir = fslib_1.npath.toPortablePath(process.cwd());
     const configuration = getConfiguration(dir);
     const { project } = await core_1.Project.find(configuration, dir);
-    return project.workspaces.filter(ws => exports.isPluginCwd(ws.relativeCwd) && !exclude.includes(ws.locator.name));
+    return project.workspaces.filter(ws => (0, exports.isPluginCwd)(ws.relativeCwd) && !exclude.includes(ws.locator.name));
 };
 exports.getPluginWorkspaces = getPluginWorkspaces;
 const getProject = async (dir = process.cwd()) => {
@@ -178,7 +180,7 @@ const getDependers = async (project, dependee) => {
 exports.getDependers = getDependers;
 const getWorkspaceByFilepath = async (project, file) => {
     // First find the package.json that this file belongs to.
-    const pkgJson = await pkg_up_1.default({ cwd: file });
+    const pkgJson = await (0, pkg_up_1.default)({ cwd: file });
     if (!pkgJson) {
         throw new Error(`failed to locate nearest package.json for file: ${file}`);
     }
@@ -190,7 +192,7 @@ const getWorkspaceByFilepath = async (project, file) => {
 };
 exports.getWorkspaceByFilepath = getWorkspaceByFilepath;
 const getWorkspacesForFiles = async (project, ...files) => {
-    return await Promise.all(files.map(async (file) => exports.getWorkspaceByFilepath(project, file)));
+    return await Promise.all(files.map(async (file) => (0, exports.getWorkspaceByFilepath)(project, file)));
 };
 exports.getWorkspacesForFiles = getWorkspacesForFiles;
 // export class WorkspaceUtil {
