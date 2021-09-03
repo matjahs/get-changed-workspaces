@@ -1,13 +1,14 @@
+/* eslint-disable filenames/match-regex */
+import "jest-extended";
 import * as path from "path";
-import {Project} from "@yarnpkg/core";
 import {
   getDependers,
   getProject,
   getWorkspace,
   getWorkspaceByFilepath
 } from "../utils/workspaces";
+import {Project} from "@yarnpkg/core";
 import {normalize} from "../main";
-import "jest-extended";
 
 const ROOT_DIR = path.resolve(__dirname, "../__fixtures__");
 const PACKAGES_DIR = path.join(ROOT_DIR, "packages");

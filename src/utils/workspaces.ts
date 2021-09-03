@@ -1,6 +1,6 @@
-import {npath, PortablePath} from "@yarnpkg/fslib";
-import {Configuration, Project, Workspace} from "@yarnpkg/core";
 import * as core from "@actions/core";
+import {Configuration, Project, Workspace} from "@yarnpkg/core";
+import {PortablePath, npath} from "@yarnpkg/fslib";
 import pkgUp from "pkg-up";
 
 const PLUGIN_DIRS = ["apps/", "plugins/certified/"];

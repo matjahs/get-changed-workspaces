@@ -135,9 +135,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getWorkspacesForFiles = exports.getWorkspaceByFilepath = exports.getDependers = exports.getWorkspace = exports.getProject = exports.getPluginWorkspaces = exports.isPluginCwd = void 0;
-const fslib_1 = __nccwpck_require__(59374);
-const core_1 = __nccwpck_require__(67284);
 const core = __importStar(__nccwpck_require__(42186));
+const core_1 = __nccwpck_require__(67284);
+const fslib_1 = __nccwpck_require__(59374);
 const pkg_up_1 = __importDefault(__nccwpck_require__(24586));
 const PLUGIN_DIRS = ["apps/", "plugins/certified/"];
 const isPluginCwd = (cwd) => PLUGIN_DIRS.some(dir => cwd.startsWith(dir));
@@ -66030,6 +66030,7 @@ const mkdirp = __nccwpck_require__(47251)
 const fs = __nccwpck_require__(35747)
 const path = __nccwpck_require__(85622)
 const chownr = __nccwpck_require__(59051)
+const normPath = __nccwpck_require__(56843)
 
 class SymlinkError extends Error {
   constructor (symlink, path) {
@@ -66055,7 +66056,20 @@ class CwdError extends Error {
   }
 }
 
+const cGet = (cache, key) => cache.get(normPath(key))
+const cSet = (cache, key, val) => cache.set(normPath(key), val)
+
+const checkCwd = (dir, cb) => {
+  fs.stat(dir, (er, st) => {
+    if (er || !st.isDirectory())
+      er = new CwdError(dir, er && er.code || 'ENOTDIR')
+    cb(er)
+  })
+}
+
 module.exports = (dir, opt, cb) => {
+  dir = normPath(dir)
+
   // if there's any overlap between mask and mode,
   // then we'll need an explicit chmod
   const umask = opt.umask
@@ -66071,13 +66085,13 @@ module.exports = (dir, opt, cb) => {
   const preserve = opt.preserve
   const unlink = opt.unlink
   const cache = opt.cache
-  const cwd = opt.cwd
+  const cwd = normPath(opt.cwd)
 
   const done = (er, created) => {
     if (er)
       cb(er)
     else {
-      cache.set(dir, true)
+      cSet(cache, dir, true)
       if (created && doChown)
         chownr(created, uid, gid, er => done(er))
       else if (needChmod)
@@ -66087,22 +66101,17 @@ module.exports = (dir, opt, cb) => {
     }
   }
 
-  if (cache && cache.get(dir) === true)
+  if (cache && cGet(cache, dir) === true)
     return done()
 
-  if (dir === cwd) {
-    return fs.stat(dir, (er, st) => {
-      if (er || !st.isDirectory())
-        er = new CwdError(dir, er && er.code || 'ENOTDIR')
-      done(er)
-    })
-  }
+  if (dir === cwd)
+    return checkCwd(dir, done)
 
   if (preserve)
     return mkdirp(dir, {mode}).then(made => done(null, made), done)
 
-  const sub = path.relative(cwd, dir)
-  const parts = sub.split(/\/|\\/)
+  const sub = normPath(path.relative(cwd, dir))
+  const parts = sub.split('/')
   mkdir_(cwd, parts, mode, cache, unlink, cwd, null, done)
 }
 
@@ -66110,22 +66119,19 @@ const mkdir_ = (base, parts, mode, cache, unlink, cwd, created, cb) => {
   if (!parts.length)
     return cb(null, created)
   const p = parts.shift()
-  const part = base + '/' + p
-  if (cache.get(part))
+  const part = normPath(path.resolve(base + '/' + p))
+  if (cGet(cache, part))
     return mkdir_(part, parts, mode, cache, unlink, cwd, created, cb)
   fs.mkdir(part, mode, onmkdir(part, parts, mode, cache, unlink, cwd, created, cb))
 }
 
 const onmkdir = (part, parts, mode, cache, unlink, cwd, created, cb) => er => {
   if (er) {
-    if (er.path && path.dirname(er.path) === cwd &&
-        (er.code === 'ENOTDIR' || er.code === 'ENOENT'))
-      return cb(new CwdError(cwd, er.code))
-
     fs.lstat(part, (statEr, st) => {
-      if (statEr)
+      if (statEr) {
+        statEr.path = statEr.path && normPath(statEr.path)
         cb(statEr)
-      else if (st.isDirectory())
+      } else if (st.isDirectory())
         mkdir_(part, parts, mode, cache, unlink, cwd, created, cb)
       else if (unlink) {
         fs.unlink(part, er => {
@@ -66144,7 +66150,21 @@ const onmkdir = (part, parts, mode, cache, unlink, cwd, created, cb) => er => {
   }
 }
 
+const checkCwdSync = dir => {
+  let ok = false
+  let code = 'ENOTDIR'
+  try {
+    ok = fs.statSync(dir).isDirectory()
+  } catch (er) {
+    code = er.code
+  } finally {
+    if (!ok)
+      throw new CwdError(dir, code)
+  }
+}
+
 module.exports.sync = (dir, opt) => {
+  dir = normPath(dir)
   // if there's any overlap between mask and mode,
   // then we'll need an explicit chmod
   const umask = opt.umask
@@ -66160,64 +66180,51 @@ module.exports.sync = (dir, opt) => {
   const preserve = opt.preserve
   const unlink = opt.unlink
   const cache = opt.cache
-  const cwd = opt.cwd
+  const cwd = normPath(opt.cwd)
 
   const done = (created) => {
-    cache.set(dir, true)
+    cSet(cache, dir, true)
     if (created && doChown)
       chownr.sync(created, uid, gid)
     if (needChmod)
       fs.chmodSync(dir, mode)
   }
 
-  if (cache && cache.get(dir) === true)
+  if (cache && cGet(cache, dir) === true)
     return done()
 
   if (dir === cwd) {
-    let ok = false
-    let code = 'ENOTDIR'
-    try {
-      ok = fs.statSync(dir).isDirectory()
-    } catch (er) {
-      code = er.code
-    } finally {
-      if (!ok)
-        throw new CwdError(dir, code)
-    }
-    done()
-    return
+    checkCwdSync(cwd)
+    return done()
   }
 
   if (preserve)
     return done(mkdirp.sync(dir, mode))
 
-  const sub = path.relative(cwd, dir)
-  const parts = sub.split(/\/|\\/)
+  const sub = normPath(path.relative(cwd, dir))
+  const parts = sub.split('/')
   let created = null
   for (let p = parts.shift(), part = cwd;
     p && (part += '/' + p);
     p = parts.shift()) {
-    if (cache.get(part))
+    part = normPath(path.resolve(part))
+    if (cGet(cache, part))
       continue
 
     try {
       fs.mkdirSync(part, mode)
       created = created || part
-      cache.set(part, true)
+      cSet(cache, part, true)
     } catch (er) {
-      if (er.path && path.dirname(er.path) === cwd &&
-          (er.code === 'ENOTDIR' || er.code === 'ENOENT'))
-        return new CwdError(cwd, er.code)
-
       const st = fs.lstatSync(part)
       if (st.isDirectory()) {
-        cache.set(part, true)
+        cSet(cache, part, true)
         continue
       } else if (unlink) {
         fs.unlinkSync(part)
         fs.mkdirSync(part, mode)
         created = created || part
-        cache.set(part, true)
+        cSet(cache, part, true)
         continue
       } else if (st.isSymbolicLink())
         return new SymlinkError(part, part + '/' + parts.join('/'))
@@ -66257,6 +66264,39 @@ module.exports = (mode, isDir, portable) => {
   }
   return mode
 }
+
+
+/***/ }),
+
+/***/ 47118:
+/***/ ((module) => {
+
+// warning: extremely hot code path.
+// This has been meticulously optimized for use
+// within npm install on large package trees.
+// Do not edit without careful benchmarking.
+const normalizeCache = Object.create(null)
+const {hasOwnProperty} = Object.prototype
+module.exports = s => {
+  if (!hasOwnProperty.call(normalizeCache, s))
+    normalizeCache[s] = s.normalize('NFKD')
+  return normalizeCache[s]
+}
+
+
+/***/ }),
+
+/***/ 56843:
+/***/ ((module) => {
+
+// on windows, either \ or / are valid directory separators.
+// on unix, \ is a valid character in filenames.
+// so, on windows, and only on windows, we replace all \ chars with /,
+// so that we can use / as our one and only directory separator char.
+
+const platform = process.env.TESTING_TAR_FAKE_PLATFORM || process.platform
+module.exports = platform !== 'win32' ? p => p
+  : p => p && p.replace(/\\/g, '/')
 
 
 /***/ }),
@@ -66321,6 +66361,7 @@ const ONDRAIN = Symbol('ondrain')
 const fs = __nccwpck_require__(35747)
 const path = __nccwpck_require__(85622)
 const warner = __nccwpck_require__(85899)
+const normPath = __nccwpck_require__(56843)
 
 const Pack = warner(class Pack extends MiniPass {
   constructor (opt) {
@@ -66333,7 +66374,7 @@ const Pack = warner(class Pack extends MiniPass {
     this.preservePaths = !!opt.preservePaths
     this.strict = !!opt.strict
     this.noPax = !!opt.noPax
-    this.prefix = (opt.prefix || '').replace(/(\\|\/)+$/, '')
+    this.prefix = normPath(opt.prefix || '')
     this.linkCache = opt.linkCache || new Map()
     this.statCache = opt.statCache || new Map()
     this.readdirCache = opt.readdirCache || new Map()
@@ -66400,7 +66441,7 @@ const Pack = warner(class Pack extends MiniPass {
   }
 
   [ADDTARENTRY] (p) {
-    const absolute = path.resolve(this.cwd, p.path)
+    const absolute = normPath(path.resolve(this.cwd, p.path))
     // in this case, we don't have to wait for the stat
     if (!this.filter(p.path, p))
       p.resume()
@@ -66416,7 +66457,7 @@ const Pack = warner(class Pack extends MiniPass {
   }
 
   [ADDFSENTRY] (p) {
-    const absolute = path.resolve(this.cwd, p)
+    const absolute = normPath(path.resolve(this.cwd, p))
     this[QUEUE].push(new PackJob(p, absolute))
     this[PROCESS]()
   }
@@ -67166,6 +67207,12 @@ module.exports = warner(class Parser extends EE {
 // while still allowing maximal safe parallelization.
 
 const assert = __nccwpck_require__(42357)
+const normalize = __nccwpck_require__(47118)
+const stripSlashes = __nccwpck_require__(88886)
+const { join } = __nccwpck_require__(85622)
+
+const platform = process.env.TESTING_TAR_FAKE_PLATFORM || process.platform
+const isWindows = platform === 'win32'
 
 module.exports = () => {
   // path => [function or Set]
@@ -67177,10 +67224,16 @@ module.exports = () => {
   const reservations = new Map()
 
   // return a set of parent dirs for a given path
-  const { join } = __nccwpck_require__(85622)
-  const getDirs = path =>
-    join(path).split(/[\\/]/).slice(0, -1).reduce((set, path) =>
-      set.length ? set.concat(join(set[set.length - 1], path)) : [path], [])
+  // '/a/b/c/d' -> ['/', '/a', '/a/b', '/a/b/c', '/a/b/c/d']
+  const getDirs = path => {
+    const dirs = path.split('/').slice(0, -1).reduce((set, path) => {
+      if (set.length)
+        path = join(set[set.length - 1], path)
+      set.push(path || '/')
+      return set
+    }, [])
+    return dirs
+  }
 
   // functions currently running
   const running = new Set()
@@ -67256,6 +67309,17 @@ module.exports = () => {
   }
 
   const reserve = (paths, fn) => {
+    // collide on matches across case and unicode normalization
+    // On windows, thanks to the magic of 8.3 shortnames, it is fundamentally
+    // impossible to determine whether two paths refer to the same thing on
+    // disk, without asking the kernel for a shortname.
+    // So, we just pretend that every path matches every other path here,
+    // effectively removing all parallelization on windows.
+    paths = isWindows ? ['win32 parallelization disabled'] : paths.map(p => {
+      // don't need normPath, because we skip this entirely for windows
+      return normalize(stripSlashes(join(p))).toLowerCase()
+    })
+
     const dirs = new Set(
       paths.map(path => getDirs(path)).reduce((a, b) => a.concat(b))
     )
@@ -67443,6 +67507,7 @@ module.exports = Pax
 "use strict";
 
 const MiniPass = __nccwpck_require__(41077)
+const normPath = __nccwpck_require__(56843)
 
 const SLURP = Symbol('slurp')
 module.exports = class ReadEntry extends MiniPass {
@@ -67489,7 +67554,7 @@ module.exports = class ReadEntry extends MiniPass {
         this.ignore = true
     }
 
-    this.path = header.path
+    this.path = normPath(header.path)
     this.mode = header.mode
     if (this.mode)
       this.mode = this.mode & 0o7777
@@ -67501,7 +67566,7 @@ module.exports = class ReadEntry extends MiniPass {
     this.mtime = header.mtime
     this.atime = header.atime
     this.ctime = header.ctime
-    this.linkpath = header.linkpath
+    this.linkpath = normPath(header.linkpath)
     this.uname = header.uname
     this.gname = header.gname
 
@@ -67536,7 +67601,7 @@ module.exports = class ReadEntry extends MiniPass {
       // a global extended header, because that's weird.
       if (ex[k] !== null && ex[k] !== undefined &&
           !(global && k === 'path'))
-        this[k] = ex[k]
+        this[k] = k === 'path' || k === 'linkpath' ? normPath(ex[k]) : ex[k]
     }
   }
 }
@@ -67720,7 +67785,8 @@ const replace = (opt, files, cb) => {
 
       fs.fstat(fd, (er, st) => {
         if (er)
-          return reject(er)
+          return fs.close(fd, () => reject(er))
+
         getPos(fd, st.size, (er, position) => {
           if (er)
             return reject(er)
@@ -67781,13 +67847,23 @@ const addFilesAsync = (p, files) => {
 const { isAbsolute, parse } = __nccwpck_require__(85622).win32
 
 // returns [root, stripped]
+// Note that windows will think that //x/y/z/a has a "root" of //x/y, and in
+// those cases, we want to sanitize it to x/y/z/a, not z/a, so we strip /
+// explicitly if it's the first character.
+// drive-specific relative paths on Windows get their root stripped off even
+// though they are not absolute, so `c:../foo` becomes ['c:', '../foo']
 module.exports = path => {
   let r = ''
-  while (isAbsolute(path)) {
+
+  let parsed = parse(path)
+  while (isAbsolute(path) || parsed.root) {
     // windows will think that //x/y/z has a "root" of //x/y/
-    const root = path.charAt(0) === '/' ? '/' : parse(path).root
+    // but strip the //?/C:/ off of //?/C:/path
+    const root = path.charAt(0) === '/' && path.slice(0, 4) !== '//?/' ? '/'
+      : parsed.root
     path = path.substr(root.length)
     r += root
+    parsed = parse(path)
   }
   return [r, path]
 }
@@ -67798,29 +67874,18 @@ module.exports = path => {
 /***/ 88886:
 /***/ ((module) => {
 
-// this is the only approach that was significantly faster than using
-// str.replace(/\/+$/, '') for strings ending with a lot of / chars and
-// containing multiple / chars.
-const batchStrings = [
-  '/'.repeat(1024),
-  '/'.repeat(512),
-  '/'.repeat(256),
-  '/'.repeat(128),
-  '/'.repeat(64),
-  '/'.repeat(32),
-  '/'.repeat(16),
-  '/'.repeat(8),
-  '/'.repeat(4),
-  '/'.repeat(2),
-  '/',
-]
-
+// warning: extremely hot code path.
+// This has been meticulously optimized for use
+// within npm install on large package trees.
+// Do not edit without careful benchmarking.
 module.exports = str => {
-  for (const s of batchStrings) {
-    while (str.length >= s.length && str.slice(-1 * s.length) === s)
-      str = str.slice(0, -1 * s.length)
+  let i = str.length - 1
+  let slashesStart = -1
+  while (i > -1 && str.charAt(i) === '/') {
+    slashesStart = i
+    i--
   }
-  return str
+  return slashesStart === -1 ? str : str.slice(0, slashesStart)
 }
 
 
@@ -67899,10 +67964,14 @@ const mkdir = __nccwpck_require__(69624)
 const wc = __nccwpck_require__(44808)
 const pathReservations = __nccwpck_require__(99587)
 const stripAbsolutePath = __nccwpck_require__(37111)
+const normPath = __nccwpck_require__(56843)
+const stripSlash = __nccwpck_require__(88886)
+const normalize = __nccwpck_require__(47118)
 
 const ONENTRY = Symbol('onEntry')
 const CHECKFS = Symbol('checkFs')
 const CHECKFS2 = Symbol('checkFs2')
+const PRUNECACHE = Symbol('pruneCache')
 const ISREUSABLE = Symbol('isReusable')
 const MAKEFS = Symbol('makeFs')
 const FILE = Symbol('file')
@@ -67923,13 +67992,11 @@ const SKIP = Symbol('skip')
 const DOCHOWN = Symbol('doChown')
 const UID = Symbol('uid')
 const GID = Symbol('gid')
+const CHECKED_CWD = Symbol('checkedCwd')
 const crypto = __nccwpck_require__(76417)
 const getFlag = __nccwpck_require__(91172)
-
-/* istanbul ignore next */
-const neverCalled = () => {
-  throw new Error('sync function called cb somehow?!?')
-}
+const platform = process.env.TESTING_TAR_FAKE_PLATFORM || process.platform
+const isWindows = platform === 'win32'
 
 // Unlinks on Windows are not atomic.
 //
@@ -67948,7 +68015,7 @@ const neverCalled = () => {
 // See: https://github.com/npm/node-tar/issues/183
 /* istanbul ignore next */
 const unlinkFile = (path, cb) => {
-  if (process.platform !== 'win32')
+  if (!isWindows)
     return fs.unlink(path, cb)
 
   const name = path + '.DELETE.' + crypto.randomBytes(16).toString('hex')
@@ -67961,7 +68028,7 @@ const unlinkFile = (path, cb) => {
 
 /* istanbul ignore next */
 const unlinkFileSync = path => {
-  if (process.platform !== 'win32')
+  if (!isWindows)
     return fs.unlinkSync(path)
 
   const name = path + '.DELETE.' + crypto.randomBytes(16).toString('hex')
@@ -67975,6 +68042,32 @@ const uint32 = (a, b, c) =>
   : b === b >>> 0 ? b
   : c
 
+// clear the cache if it's a case-insensitive unicode-squashing match.
+// we can't know if the current file system is case-sensitive or supports
+// unicode fully, so we check for similarity on the maximally compatible
+// representation.  Err on the side of pruning, since all it's doing is
+// preventing lstats, and it's not the end of the world if we get a false
+// positive.
+// Note that on windows, we always drop the entire cache whenever a
+// symbolic link is encountered, because 8.3 filenames are impossible
+// to reason about, and collisions are hazards rather than just failures.
+const cacheKeyNormalize = path => normalize(stripSlash(normPath(path)))
+  .toLowerCase()
+
+const pruneCache = (cache, abs) => {
+  abs = cacheKeyNormalize(abs)
+  for (const path of cache.keys()) {
+    const pnorm = cacheKeyNormalize(path)
+    if (pnorm === abs || pnorm.indexOf(abs + '/') === 0)
+      cache.delete(path)
+  }
+}
+
+const dropCache = cache => {
+  for (const key of cache.keys())
+    cache.delete(key)
+}
+
 class Unpack extends Parser {
   constructor (opt) {
     if (!opt)
@@ -67986,6 +68079,8 @@ class Unpack extends Parser {
     }
 
     super(opt)
+
+    this[CHECKED_CWD] = false
 
     this.reservations = pathReservations()
 
@@ -68032,7 +68127,7 @@ class Unpack extends Parser {
     this.forceChown = opt.forceChown === true
 
     // turn ><?| in filenames into 0xf000-higher encoded forms
-    this.win32 = !!opt.win32 || process.platform === 'win32'
+    this.win32 = !!opt.win32 || isWindows
 
     // do not unpack over files that are newer than what's in the archive
     this.newer = !!opt.newer
@@ -68052,7 +68147,7 @@ class Unpack extends Parser {
     // links, and removes symlink directories rather than erroring
     this.unlink = !!opt.unlink
 
-    this.cwd = path.resolve(opt.cwd || process.cwd())
+    this.cwd = normPath(path.resolve(opt.cwd || process.cwd()))
     this.strip = +opt.strip || 0
     // if we're not chmodding, then we don't need the process umask
     this.processUmask = opt.noChmod ? 0 : process.umask()
@@ -68085,23 +68180,24 @@ class Unpack extends Parser {
 
   [CHECKPATH] (entry) {
     if (this.strip) {
-      const parts = entry.path.split(/\/|\\/)
+      const parts = normPath(entry.path).split('/')
       if (parts.length < this.strip)
         return false
       entry.path = parts.slice(this.strip).join('/')
-      if (entry.path === '' && entry.type !== 'Directory' && entry.type !== 'GNUDumpDir')
-        return false
 
       if (entry.type === 'Link') {
-        const linkparts = entry.linkpath.split(/\/|\\/)
+        const linkparts = normPath(entry.linkpath).split('/')
         if (linkparts.length >= this.strip)
           entry.linkpath = linkparts.slice(this.strip).join('/')
+        else
+          return false
       }
     }
 
     if (!this.preservePaths) {
-      const p = entry.path
-      if (p.match(/(^|\/|\\)\.\.(\\|\/|$)/)) {
+      const p = normPath(entry.path)
+      const parts = p.split('/')
+      if (parts.includes('..') || isWindows && /^[a-z]:\.\.$/i.test(parts[0])) {
         this.warn('TAR_ENTRY_ERROR', `path contains '..'`, {
           entry,
           path: p,
@@ -68109,8 +68205,7 @@ class Unpack extends Parser {
         return false
       }
 
-      // absolutes on posix are also absolutes on win32
-      // so we only need to test this one to get both
+      // strip off the root
       const [root, stripped] = stripAbsolutePath(p)
       if (root) {
         entry.path = stripped
@@ -68121,17 +68216,41 @@ class Unpack extends Parser {
       }
     }
 
-    // only encode : chars that aren't drive letter indicators
-    if (this.win32) {
-      const parsed = path.win32.parse(entry.path)
-      entry.path = parsed.root === '' ? wc.encode(entry.path)
-        : parsed.root + wc.encode(entry.path.substr(parsed.root.length))
+    if (path.isAbsolute(entry.path))
+      entry.absolute = normPath(path.resolve(entry.path))
+    else
+      entry.absolute = normPath(path.resolve(this.cwd, entry.path))
+
+    // if we somehow ended up with a path that escapes the cwd, and we are
+    // not in preservePaths mode, then something is fishy!  This should have
+    // been prevented above, so ignore this for coverage.
+    /* istanbul ignore if - defense in depth */
+    if (!this.preservePaths &&
+        entry.absolute.indexOf(this.cwd + '/') !== 0 &&
+        entry.absolute !== this.cwd) {
+      this.warn('TAR_ENTRY_ERROR', 'path escaped extraction target', {
+        entry,
+        path: normPath(entry.path),
+        resolvedPath: entry.absolute,
+        cwd: this.cwd,
+      })
+      return false
     }
 
-    if (path.isAbsolute(entry.path))
-      entry.absolute = entry.path
-    else
-      entry.absolute = path.resolve(this.cwd, entry.path)
+    // an archive can set properties on the extraction directory, but it
+    // may not replace the cwd with a different kind of thing entirely.
+    if (entry.absolute === this.cwd &&
+        entry.type !== 'Directory' &&
+        entry.type !== 'GNUDumpDir')
+      return false
+
+    // only encode : chars that aren't drive letter indicators
+    if (this.win32) {
+      const { root: aRoot } = path.win32.parse(entry.absolute)
+      entry.absolute = aRoot + wc.encode(entry.absolute.substr(aRoot.length))
+      const { root: pRoot } = path.win32.parse(entry.path)
+      entry.path = pRoot + wc.encode(entry.path.substr(pRoot.length))
+    }
 
     return true
   }
@@ -68177,7 +68296,7 @@ class Unpack extends Parser {
   }
 
   [MKDIR] (dir, mode, cb) {
-    mkdir(dir, {
+    mkdir(normPath(dir), {
       uid: this.uid,
       gid: this.gid,
       processUid: this.processUid,
@@ -68222,6 +68341,7 @@ class Unpack extends Parser {
     stream.on('error', er => {
       if (stream.fd)
         fs.close(stream.fd, () => {})
+
       // flush all the data out so that we aren't left hanging
       // if the error wasn't actually fatal.  otherwise the parse
       // is blocked, and we never proceed.
@@ -68236,6 +68356,7 @@ class Unpack extends Parser {
         /* istanbul ignore else - we should always have a fd by now */
         if (stream.fd)
           fs.close(stream.fd, () => {})
+
         this[ONERROR](er, entry)
         fullyDone()
         return
@@ -68335,7 +68456,8 @@ class Unpack extends Parser {
   }
 
   [HARDLINK] (entry, done) {
-    this[LINK](entry, path.resolve(this.cwd, entry.linkpath), 'link', done)
+    const linkpath = normPath(path.resolve(this.cwd, entry.linkpath))
+    this[LINK](entry, linkpath, 'link', done)
   }
 
   [PEND] () {
@@ -68360,7 +68482,7 @@ class Unpack extends Parser {
       !this.unlink &&
       st.isFile() &&
       st.nlink <= 1 &&
-      process.platform !== 'win32'
+      !isWindows
   }
 
   // check if a thing is there, and if so, try to clobber it
@@ -68372,46 +68494,107 @@ class Unpack extends Parser {
     this.reservations.reserve(paths, done => this[CHECKFS2](entry, done))
   }
 
-  [CHECKFS2] (entry, done) {
+  [PRUNECACHE] (entry) {
     // if we are not creating a directory, and the path is in the dirCache,
     // then that means we are about to delete the directory we created
     // previously, and it is no longer going to be a directory, and neither
     // is any of its children.
-    if (entry.type !== 'Directory') {
-      for (const path of this.dirCache.keys()) {
-        if (path === entry.absolute ||
-            path.indexOf(entry.absolute + '/') === 0 ||
-            path.indexOf(entry.absolute + '\\') === 0)
-          this.dirCache.delete(path)
-      }
+    // If a symbolic link is encountered, all bets are off.  There is no
+    // reasonable way to sanitize the cache in such a way we will be able to
+    // avoid having filesystem collisions.  If this happens with a non-symlink
+    // entry, it'll just fail to unpack, but a symlink to a directory, using an
+    // 8.3 shortname or certain unicode attacks, can evade detection and lead
+    // to arbitrary writes to anywhere on the system.
+    if (entry.type === 'SymbolicLink')
+      dropCache(this.dirCache)
+    else if (entry.type !== 'Directory')
+      pruneCache(this.dirCache, entry.absolute)
+  }
+
+  [CHECKFS2] (entry, fullyDone) {
+    this[PRUNECACHE](entry)
+
+    const done = er => {
+      this[PRUNECACHE](entry)
+      fullyDone(er)
     }
 
-    this[MKDIR](path.dirname(entry.absolute), this.dmode, er => {
-      if (er) {
-        this[ONERROR](er, entry)
-        done()
-        return
+    const checkCwd = () => {
+      this[MKDIR](this.cwd, this.dmode, er => {
+        if (er) {
+          this[ONERROR](er, entry)
+          done()
+          return
+        }
+        this[CHECKED_CWD] = true
+        start()
+      })
+    }
+
+    const start = () => {
+      if (entry.absolute !== this.cwd) {
+        const parent = normPath(path.dirname(entry.absolute))
+        if (parent !== this.cwd) {
+          return this[MKDIR](parent, this.dmode, er => {
+            if (er) {
+              this[ONERROR](er, entry)
+              done()
+              return
+            }
+            afterMakeParent()
+          })
+        }
       }
-      fs.lstat(entry.absolute, (er, st) => {
+      afterMakeParent()
+    }
+
+    const afterMakeParent = () => {
+      fs.lstat(entry.absolute, (lstatEr, st) => {
         if (st && (this.keep || this.newer && st.mtime > entry.mtime)) {
           this[SKIP](entry)
           done()
-        } else if (er || this[ISREUSABLE](entry, st))
-          this[MAKEFS](null, entry, done)
-        else if (st.isDirectory()) {
+          return
+        }
+        if (lstatEr || this[ISREUSABLE](entry, st))
+          return this[MAKEFS](null, entry, done)
+
+        if (st.isDirectory()) {
           if (entry.type === 'Directory') {
-            if (!this.noChmod && (!entry.mode || (st.mode & 0o7777) === entry.mode))
-              this[MAKEFS](null, entry, done)
-            else {
-              fs.chmod(entry.absolute, entry.mode,
-                er => this[MAKEFS](er, entry, done))
-            }
-          } else
-            fs.rmdir(entry.absolute, er => this[MAKEFS](er, entry, done))
-        } else
-          unlinkFile(entry.absolute, er => this[MAKEFS](er, entry, done))
+            const needChmod = !this.noChmod &&
+              entry.mode &&
+              (st.mode & 0o7777) !== entry.mode
+            const afterChmod = er => this[MAKEFS](er, entry, done)
+            if (!needChmod)
+              return afterChmod()
+            return fs.chmod(entry.absolute, entry.mode, afterChmod)
+          }
+          // Not a dir entry, have to remove it.
+          // NB: the only way to end up with an entry that is the cwd
+          // itself, in such a way that == does not detect, is a
+          // tricky windows absolute path with UNC or 8.3 parts (and
+          // preservePaths:true, or else it will have been stripped).
+          // In that case, the user has opted out of path protections
+          // explicitly, so if they blow away the cwd, c'est la vie.
+          if (entry.absolute !== this.cwd) {
+            return fs.rmdir(entry.absolute, er =>
+              this[MAKEFS](er, entry, done))
+          }
+        }
+
+        // not a dir, and not reusable
+        // don't remove if the cwd, we want that error
+        if (entry.absolute === this.cwd)
+          return this[MAKEFS](null, entry, done)
+
+        unlinkFile(entry.absolute, er =>
+          this[MAKEFS](er, entry, done))
       })
-    })
+    }
+
+    if (this[CHECKED_CWD])
+      start()
+    else
+      checkCwd()
   }
 
   [MAKEFS] (er, entry, done) {
@@ -68440,7 +68623,7 @@ class Unpack extends Parser {
   }
 
   [LINK] (entry, linkpath, link, done) {
-    // XXX: get the type ('file' or 'dir') for windows
+    // XXX: get the type ('symlink' or 'junction') for windows
     fs[link](linkpath, entry.absolute, er => {
       if (er)
         this[ONERROR](er, entry)
@@ -68453,47 +68636,69 @@ class Unpack extends Parser {
   }
 }
 
+const callSync = fn => {
+  try {
+    return [null, fn()]
+  } catch (er) {
+    return [er, null]
+  }
+}
 class UnpackSync extends Unpack {
-  [CHECKFS] (entry) {
-    if (entry.type !== 'Directory') {
-      for (const path of this.dirCache.keys()) {
-        if (path === entry.absolute ||
-            path.indexOf(entry.absolute + '/') === 0 ||
-            path.indexOf(entry.absolute + '\\') === 0)
-          this.dirCache.delete(path)
-      }
-    }
-
-    const er = this[MKDIR](path.dirname(entry.absolute), this.dmode, neverCalled)
-    if (er)
-      return this[ONERROR](er, entry)
-    try {
-      const st = fs.lstatSync(entry.absolute)
-      if (this.keep || this.newer && st.mtime > entry.mtime)
-        return this[SKIP](entry)
-      else if (this[ISREUSABLE](entry, st))
-        return this[MAKEFS](null, entry, neverCalled)
-      else {
-        try {
-          if (st.isDirectory()) {
-            if (entry.type === 'Directory') {
-              if (!this.noChmod && entry.mode && (st.mode & 0o7777) !== entry.mode)
-                fs.chmodSync(entry.absolute, entry.mode)
-            } else
-              fs.rmdirSync(entry.absolute)
-          } else
-            unlinkFileSync(entry.absolute)
-          return this[MAKEFS](null, entry, neverCalled)
-        } catch (er) {
-          return this[ONERROR](er, entry)
-        }
-      }
-    } catch (er) {
-      return this[MAKEFS](null, entry, neverCalled)
-    }
+  [MAKEFS] (er, entry) {
+    return super[MAKEFS](er, entry, () => {})
   }
 
-  [FILE] (entry, _) {
+  [CHECKFS] (entry) {
+    this[PRUNECACHE](entry)
+
+    if (!this[CHECKED_CWD]) {
+      const er = this[MKDIR](this.cwd, this.dmode)
+      if (er)
+        return this[ONERROR](er, entry)
+      this[CHECKED_CWD] = true
+    }
+
+    // don't bother to make the parent if the current entry is the cwd,
+    // we've already checked it.
+    if (entry.absolute !== this.cwd) {
+      const parent = normPath(path.dirname(entry.absolute))
+      if (parent !== this.cwd) {
+        const mkParent = this[MKDIR](parent, this.dmode)
+        if (mkParent)
+          return this[ONERROR](mkParent, entry)
+      }
+    }
+
+    const [lstatEr, st] = callSync(() => fs.lstatSync(entry.absolute))
+    if (st && (this.keep || this.newer && st.mtime > entry.mtime))
+      return this[SKIP](entry)
+
+    if (lstatEr || this[ISREUSABLE](entry, st))
+      return this[MAKEFS](null, entry)
+
+    if (st.isDirectory()) {
+      if (entry.type === 'Directory') {
+        const needChmod = !this.noChmod &&
+          entry.mode &&
+          (st.mode & 0o7777) !== entry.mode
+        const [er] = needChmod ? callSync(() => {
+          fs.chmodSync(entry.absolute, entry.mode)
+        }) : []
+        return this[MAKEFS](er, entry)
+      }
+      // not a dir entry, have to remove it
+      const [er] = callSync(() => fs.rmdirSync(entry.absolute))
+      this[MAKEFS](er, entry)
+    }
+
+    // not a dir, and not reusable.
+    // don't remove if it's the cwd, since we want that error.
+    const [er] = entry.absolute === this.cwd ? []
+      : callSync(() => unlinkFileSync(entry.absolute))
+    this[MAKEFS](er, entry)
+  }
+
+  [FILE] (entry, done) {
     const mode = entry.mode & 0o7777 || this.fmode
 
     const oner = er => {
@@ -68505,6 +68710,7 @@ class UnpackSync extends Unpack {
       }
       if (er || closeError)
         this[ONERROR](er || closeError, entry)
+      done()
     }
 
     let fd
@@ -68564,11 +68770,14 @@ class UnpackSync extends Unpack {
     })
   }
 
-  [DIRECTORY] (entry, _) {
+  [DIRECTORY] (entry, done) {
     const mode = entry.mode & 0o7777 || this.dmode
     const er = this[MKDIR](entry.absolute, mode)
-    if (er)
-      return this[ONERROR](er, entry)
+    if (er) {
+      this[ONERROR](er, entry)
+      done()
+      return
+    }
     if (entry.mtime && !this.noMtime) {
       try {
         fs.utimesSync(entry.absolute, entry.atime || new Date(), entry.mtime)
@@ -68579,12 +68788,13 @@ class UnpackSync extends Unpack {
         fs.chownSync(entry.absolute, this[UID](entry), this[GID](entry))
       } catch (er) {}
     }
+    done()
     entry.resume()
   }
 
   [MKDIR] (dir, mode) {
     try {
-      return mkdir.sync(dir, {
+      return mkdir.sync(normPath(dir), {
         uid: this.uid,
         gid: this.gid,
         processUid: this.processUid,
@@ -68601,9 +68811,10 @@ class UnpackSync extends Unpack {
     }
   }
 
-  [LINK] (entry, linkpath, link, _) {
+  [LINK] (entry, linkpath, link, done) {
     try {
       fs[link + 'Sync'](linkpath, entry.absolute)
+      done()
       entry.resume()
     } catch (er) {
       return this[ONERROR](er, entry)
@@ -68731,12 +68942,14 @@ const Pax = __nccwpck_require__(77996)
 const Header = __nccwpck_require__(66043)
 const fs = __nccwpck_require__(35747)
 const path = __nccwpck_require__(85622)
+const normPath = __nccwpck_require__(56843)
+const stripSlash = __nccwpck_require__(88886)
 
 const prefixPath = (path, prefix) => {
   if (!prefix)
-    return path
-  path = path.replace(/^\.([/\\]|$)/, '')
-  return prefix + '/' + path
+    return normPath(path)
+  path = normPath(path).replace(/^\.(\/|$)/, '')
+  return stripSlash(prefix) + '/' + path
 }
 
 const maxReadSize = 16 * 1024 * 1024
@@ -68758,6 +68971,7 @@ const MODE = Symbol('mode')
 const AWAITDRAIN = Symbol('awaitDrain')
 const ONDRAIN = Symbol('ondrain')
 const PREFIX = Symbol('prefix')
+const HAD_ERROR = Symbol('hadError')
 const warner = __nccwpck_require__(85899)
 const winchars = __nccwpck_require__(44808)
 const stripAbsolutePath = __nccwpck_require__(37111)
@@ -68770,22 +68984,22 @@ const WriteEntry = warner(class WriteEntry extends MiniPass {
     super(opt)
     if (typeof p !== 'string')
       throw new TypeError('path is required')
-    this.path = p
+    this.path = normPath(p)
     // suppress atime, ctime, uid, gid, uname, gname
     this.portable = !!opt.portable
     // until node has builtin pwnam functions, this'll have to do
-    this.myuid = process.getuid && process.getuid()
+    this.myuid = process.getuid && process.getuid() || 0
     this.myuser = process.env.USER || ''
     this.maxReadSize = opt.maxReadSize || maxReadSize
     this.linkCache = opt.linkCache || new Map()
     this.statCache = opt.statCache || new Map()
     this.preservePaths = !!opt.preservePaths
-    this.cwd = opt.cwd || process.cwd()
+    this.cwd = normPath(opt.cwd || process.cwd())
     this.strict = !!opt.strict
     this.noPax = !!opt.noPax
     this.noMtime = !!opt.noMtime
     this.mtime = opt.mtime || null
-    this.prefix = opt.prefix || null
+    this.prefix = opt.prefix ? normPath(opt.prefix) : null
 
     this.fd = null
     this.blockLen = null
@@ -68810,11 +69024,13 @@ const WriteEntry = warner(class WriteEntry extends MiniPass {
 
     this.win32 = !!opt.win32 || process.platform === 'win32'
     if (this.win32) {
+      // force the \ to / normalization, since we might not *actually*
+      // be on windows, but want \ to be considered a path separator.
       this.path = winchars.decode(this.path.replace(/\\/g, '/'))
       p = p.replace(/\\/g, '/')
     }
 
-    this.absolute = opt.absolute || path.resolve(this.cwd, p)
+    this.absolute = normPath(opt.absolute || path.resolve(this.cwd, p))
 
     if (this.path === '')
       this.path = './'
@@ -68830,6 +69046,12 @@ const WriteEntry = warner(class WriteEntry extends MiniPass {
       this[ONLSTAT](this.statCache.get(this.absolute))
     else
       this[LSTAT]()
+  }
+
+  emit (ev, ...data) {
+    if (ev === 'error')
+      this[HAD_ERROR] = true
+    return super.emit(ev, ...data)
   }
 
   [LSTAT] () {
@@ -68928,14 +69150,14 @@ const WriteEntry = warner(class WriteEntry extends MiniPass {
   }
 
   [ONREADLINK] (linkpath) {
-    this.linkpath = linkpath.replace(/\\/g, '/')
+    this.linkpath = normPath(linkpath)
     this[HEADER]()
     this.end()
   }
 
   [HARDLINK] (linkpath) {
     this.type = 'Link'
-    this.linkpath = path.relative(this.cwd, linkpath).replace(/\\/g, '/')
+    this.linkpath = normPath(path.relative(this.cwd, linkpath))
     this.stat.size = 0
     this[HEADER]()
     this.end()
@@ -68969,6 +69191,9 @@ const WriteEntry = warner(class WriteEntry extends MiniPass {
 
   [ONOPENFILE] (fd) {
     this.fd = fd
+    if (this[HAD_ERROR])
+      return this[CLOSE]()
+
     this.blockLen = 512 * Math.ceil(this.stat.size / 512)
     this.blockRemain = this.blockLen
     const bufLen = Math.min(this.blockLen, this.maxReadSize)
@@ -69130,7 +69355,7 @@ const WriteEntryTar = warner(class WriteEntryTar extends MiniPass {
 
     this.prefix = opt.prefix || null
 
-    this.path = readEntry.path
+    this.path = normPath(readEntry.path)
     this.mode = this[MODE](readEntry.mode)
     this.uid = this.portable ? null : readEntry.uid
     this.gid = this.portable ? null : readEntry.gid
@@ -69140,7 +69365,7 @@ const WriteEntryTar = warner(class WriteEntryTar extends MiniPass {
     this.mtime = this.noMtime ? null : opt.mtime || readEntry.mtime
     this.atime = this.portable ? null : readEntry.atime
     this.ctime = this.portable ? null : readEntry.ctime
-    this.linkpath = readEntry.linkpath
+    this.linkpath = normPath(readEntry.linkpath)
 
     if (typeof opt.onwarn === 'function')
       this.on('warn', opt.onwarn)
