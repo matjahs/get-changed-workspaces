@@ -32,7 +32,7 @@
     "@yarnpkg/fslib": "^2.5.2",
     "pkg-up": "^3.1.0",
     "tmpl": ">=1.0.5",
-    "set-value": ">=4.0.1"
+    "set-value": ">=4.1.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
