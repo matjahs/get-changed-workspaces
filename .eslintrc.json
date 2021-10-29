@@ -4,7 +4,8 @@
     "@typescript-eslint"
   ],
   "extends": [
-    "plugin:github/recommended"
+    "plugin:github/recommended",
+    "plugin:jest/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -72,7 +73,6 @@
   },
   "env": {
     "node": true,
-    "es6": true,
-    "jest/globals": true
+    "es6": true
   }
 }
