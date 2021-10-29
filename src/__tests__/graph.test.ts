@@ -1,3 +1,4 @@
+/// <reference types="jest-extended" />
 /* eslint-disable filenames/match-regex */
 import "jest-extended";
 import * as path from "path";

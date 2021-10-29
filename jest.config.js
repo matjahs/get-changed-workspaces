@@ -9,7 +9,7 @@ module.exports = {
   moduleFileExtensions: ["js", "ts"],
   testEnvironment: "node",
   testMatch: ["**/*.test.ts"],
-  setupFilesAfterEnv: ["jest-extended"],
+  setupFilesAfterEnv: ["jest-extended/all"],
   testRunner: "jest-circus/runner",
   transform: {
     "^.+\\.ts$": "ts-jest"

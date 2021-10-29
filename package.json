@@ -31,8 +31,8 @@
     "@yarnpkg/core": "^3.0.0",
     "@yarnpkg/fslib": "^2.5.2",
     "pkg-up": "^3.1.0",
-    "tmpl": ">=1.0.5",
-    "set-value": ">=4.1.0"
+    "set-value": ">=4.1.0",
+    "tmpl": ">=1.0.5"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
@@ -43,13 +43,13 @@
     "eslint-plugin-github": "^4.3.2",
     "eslint-plugin-jest": "^25.2.2",
     "fs-jetpack": "^4.2.0",
+    "husky": "^7.0.2",
     "jest": "^27.3.1",
     "jest-circus": "^27.2.5",
     "jest-extended": "^1.1.0",
     "js-yaml": "^4.1.0",
     "prettier": "2.4.1",
     "ts-jest": "^27.0.7",
-    "typescript": "^4.4.4",
-    "husky": "^7.0.2"
+    "typescript": "^4.4.4"
   }
 }
