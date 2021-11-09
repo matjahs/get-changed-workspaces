@@ -40,7 +40,7 @@
     "@typescript-eslint/parser": "^4.32.0",
     "@vercel/ncc": "^0.31.1",
     "eslint": "^8.1.0",
-    "eslint-plugin-github": "^4.3.2",
+    "eslint-plugin-github": "^4.3.4",
     "eslint-plugin-jest": "^25.2.2",
     "fs-jetpack": "^4.2.0",
     "husky": "^7.0.4",
