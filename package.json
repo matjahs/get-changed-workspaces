@@ -41,7 +41,7 @@
     "@vercel/ncc": "^0.31.1",
     "eslint": "^8.5.0",
     "eslint-plugin-github": "^4.3.2",
-    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-jest": "^25.7.0",
     "fs-jetpack": "^4.2.0",
     "husky": "^7.0.4",
     "jest": "^27.4.5",
