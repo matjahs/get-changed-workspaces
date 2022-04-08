@@ -1,7 +1,6 @@
 import * as core from "@actions/core";
 import {Configuration, Project, Workspace} from "@yarnpkg/core";
 import {PortablePath, npath} from "@yarnpkg/fslib";
-import pkgUp from "pkg-up";
 
 const PLUGIN_DIRS = ["apps/", "plugins/certified/"];
 
@@ -63,14 +62,8 @@ export const getWorkspaceByFilepath = async (
   project: Project,
   file: string
 ): Promise<Workspace> => {
-  // First find the package.json that this file belongs to.
-  const pkgJson = await pkgUp({cwd: file});
-  if (!pkgJson) {
-    throw new Error(`failed to locate nearest package.json for file: ${file}`);
-  }
-
   // Use Yarn API to resolve package.json to a workspace
-  const filepath = npath.toPortablePath(pkgJson);
+  const filepath = npath.toPortablePath(file);
   const ws = project.getWorkspaceByFilePath(filepath);
 
   core.info(`${file}-->${ws.locator.name}`);

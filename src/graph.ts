@@ -1,9 +1,7 @@
 import path from "path";
-
 import * as core from "@actions/core";
-
-import type {Descriptor, IdentHash, Workspace} from "@yarnpkg/core";
-import pkgUp from "pkg-up";
+import {Configuration, Descriptor, IdentHash, Project, Workspace} from "@yarnpkg/core";
+import {Filename, npath} from "@yarnpkg/fslib";
 
 interface GraphNode {
   workspaceId: string;
@@ -56,10 +54,22 @@ export class YarnGraph {
   async getWorkspacesForFiles(...files: string[]): Promise<string[]> {
     const resultSet = new Set<string>();
 
+    const cwd = npath.toPortablePath(process.cwd());
+    const projectCwd = await Configuration.findProjectCwd(cwd, Filename.lockfile);
+    if (projectCwd === null) {
+      core.setFailed("Could not find yarn.lock file");
+      return [];
+    }
+    const configuration = await Configuration.find(cwd, null);
+    const {project} = await Project.find(configuration, projectCwd);
+
     const workspaceDirs = new Set(
       await Promise.all(
         files.map(async file => {
-          const workspaceDir = await pkgUp({cwd: path.dirname(path.resolve(file))});
+          const filepath = npath.toPortablePath(file);
+          const workspace = project.getWorkspaceByFilePath(filepath);
+          const workspaceDir = workspace.relativeCwd;
+
           if (workspaceDir === undefined || workspaceDir === null) {
             core.warning(`Workspace not found for file '${file}'`);
           }

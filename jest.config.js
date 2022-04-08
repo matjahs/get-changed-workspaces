@@ -1,18 +1,13 @@
 module.exports = {
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.test.json"
-    }
-  },
-  preset: "ts-jest",
   clearMocks: true,
-  moduleFileExtensions: ["js", "ts"],
   testEnvironment: "node",
-  testMatch: ["**/*.test.ts"],
-  setupFilesAfterEnv: ["jest-extended/all"],
-  testRunner: "jest-circus/runner",
+  testMatch: ["<rootDir>/src/__tests__/**/*\.test\.ts"],
+  transformIgnorePatterns: [
+    "<rootDir>\/node_modules\/pkg-up\/index\.js"
+  ],
   transform: {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.(t|j)sx?$": "@swc/jest",
   },
+  setupFilesAfterEnv: ["jest-extended/all"],
   verbose: true
 };
