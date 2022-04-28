@@ -34,7 +34,7 @@
     "tmpl": ">=1.0.5"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.171",
+    "@swc/core": "^1.2.173",
     "@swc/jest": "^0.2.20",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.25",
@@ -43,7 +43,7 @@
     "@vercel/ncc": "^0.33.4",
     "eslint": "^8.14.0",
     "eslint-plugin-github": "^4.3.6",
-    "eslint-plugin-jest": "^26.1.4",
+    "eslint-plugin-jest": "^26.1.5",
     "fs-jetpack": "^4.3.1",
     "husky": "^7.0.4",
     "jest": "^27.5.1",
