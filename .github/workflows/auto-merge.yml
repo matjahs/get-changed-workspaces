@@ -2,11 +2,14 @@ name: auto-merge
 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  steps:
-    - uses: actions/checkout@v2
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
     - uses: ahmadnassri/action-dependabot-auto-merge@v2
       with:
         target: minor
-        github-token: ${{ secrets.mytoken }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
